@@ -10,7 +10,7 @@ function initializeUI() {
     const uiContainer = document.querySelector('#ui-container');
 
     // gets / creates ingredients container, and creates a draggableGameObject 
-    uiContainer.ingredientsContainer = new DraggableGameObject({element: document.querySelector('#ingredients')})
+    const ingredientsContainer = new DraggableGameObject({element: document.querySelector('#ingredients')})
         .setPosition(0, gameContainer.rect.height)
         .setOrigin(0,1)
         .addSnapPosition('bot', 0, gameContainer.rect.height)
@@ -20,10 +20,12 @@ function initializeUI() {
         .setHomeChangeDistance(gameContainer.rect.height / 2)
         .setXAxisLock(true)
     
+    uiContainer.ingredientsContainer = ingredientsContainer;
+
     const cuttingBoard = new GameObject()
         .setSize(450, 500)
         .setOrigin(.5, 0)
-        .setParent(uiContainer.ingredientsContainer)
+        .setParent(ingredientsContainer)
         .setPosition(gameContainer.centerX, 120)
     cuttingBoard.getElement().textContent = 'cutting board!'
 
@@ -39,6 +41,9 @@ function initializeUI() {
         .setSnapDistance(50)
         .setHomeChangeDistance(gameContainer.rect.height / 2)
         .setXAxisLock(true)
+        .on('dragging', () => {
+            // ingredientsContainer.setPosition(undefined, )
+        })
 
 
     const cuttingBoardIngredients = {};

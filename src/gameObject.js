@@ -69,6 +69,10 @@ class GameObject {
         }
 
         this.isDestroyed = false;
+
+
+        // event emitter for this object
+        this.events = new EventEmitter();
     }
 
     // set the position of the element.
@@ -307,6 +311,27 @@ class GameObject {
         return this;
     }
 
+    // event emitter helper methods
+    on(...args) {
+        this.events.on(...args);
+        return this;
+    }
+
+    off(...args) {
+        this.events.off(...args);
+        return this;
+    }
+
+    once(...args) {
+        this.events.once(...args);
+        return this;
+    }
+
+    trigger(...args) {
+        this.events.trigger(...args);
+        return this;
+    }
+
     static setDefaultContainer(container) {
         this.defaultContainer = container;
     }
@@ -348,6 +373,7 @@ class DraggableGameObject extends GameObject {
             }
             this.dragPosition.set(this._position);
             this.targetPosition.set(this._position);
+            this.events.trigger('dragstart', this.dragPosition.copy());
         });
         window.addEventListener('mousemove', (e) => {
             if (!this.isDragging) {
@@ -373,12 +399,14 @@ class DraggableGameObject extends GameObject {
             } else {
                 this.currentId = undefined;
             }
+            this.events.trigger('dragging', this.dragPosition.copy());
         });
         window.addEventListener('mouseup', (e) => {
             this.isDragging = false;
             if (this.currentId) {
                 this.homeId = this.currentId;
             }
+            this.events.trigger('dragend', this.homeId);
         });
 
         this.setAnimationUpdateFunction(() => {

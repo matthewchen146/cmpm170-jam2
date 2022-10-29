@@ -10,20 +10,20 @@ class EventEmitter {
         this.events = {};
     }
 
-    on(eventName, callback, {once, id}) {
+    on(eventName, callback, options = {}) {
         if (!this.events[eventName]) {
             this.events[eventName] = [];
         }
         this.events[eventName].push({
             callback,
-            once: once || false,
-            id
+            once: options.once || false,
+            id: options.id
         });
         return this;
     }
 
-    once(eventName, callback, {id}) {
-        this.on(eventName, callback, {once: true, id});
+    once(eventName, callback, options = {}) {
+        this.on(eventName, callback, {once: true, id: options.id});
         return this;
     }
 
@@ -43,16 +43,16 @@ class EventEmitter {
         return this;
     }
 
-    trigger(eventName) {
+    trigger(eventName, ...args) {
         const callbackArray = this.events[eventName] || [];
         for (let i = 0; i < callbackArray.length; i++) {
             const {callback, once} = callbackArray[i];
-            callback();
+            callback(...args);
             if (once) {
                 callbackArray.splice(i, 1);
                 i -= 1;
             }
-        }   
-        
+        }
+        return this;
     }
 }
