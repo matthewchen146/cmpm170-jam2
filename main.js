@@ -59,6 +59,8 @@ function update(delta, time) {
     // set currency text in currency label
     currencyLabel.setProperty('textContent', `${currency.toFixed(2)} catnip`);
 
+    //season
+    getSeason();
 }
 
 

@@ -19,16 +19,6 @@ function addMonth(){
         gameCalender.year++;
     }
     
-    constructCalender()
-}
-
-//constructor functions
-function constructCalender(){
-    let timeSection = document.getElementById('game-time');
-
-    let timeMessage = " Year: " + gameCalender.year + " Month: " + gameCalender.month; 
-
-    timeSection.innerText = timeMessage;
 }
 
 function getSeason(){
