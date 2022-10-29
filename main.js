@@ -19,6 +19,8 @@ async function load() {
 
 let pot;
 let ingredientsContainer;
+let currencyLabel;
+let currency = 0;
 
 // use this function to initialize anything
 function preUpdate() {
@@ -30,6 +32,9 @@ function preUpdate() {
         .setPosition(gameContainer.centerX, 550)
         .setOrigin(.5, .5)
     
+    currencyLabel = new GameObject({element: document.querySelector('#currency')});
+
+
     // gets / creates ingredients container, and creates a draggableGameObject 
     ingredientsContainer = new DraggableGameObject({element: document.querySelector('#ingredients')})
         .setPosition(0, gameContainer.rect.height)
@@ -63,7 +68,12 @@ function update(delta, time) {
         .setScale(Math.cos(time * .005))
         .rotate(.05)
     
-    // console.log(ingredientsContainer.getClosestSnapPositionId());
+    // add currency here
+    currency += delta / 1000;
+
+    // set currency text in currency label
+    currencyLabel.getElement().textContent = `${currency.toFixed(2)} catnip`;
+
 }
 
 
