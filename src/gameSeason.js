@@ -2,7 +2,7 @@ const SPEED = 9000;
 
 let gameCalender= {
     year: 1,
-    month: 1,
+    month: 3,
 }
 
 let gameClock = setInterval(function(){
@@ -35,6 +35,7 @@ function getSeason(){
     if(month > 12 && month < 3){
         return 'winter';
     }
+    eventEmitter.on('seasonCycle', (arg1, arg2, arg3, arg4) => { console.log('seasonCycle has triggerd!!') });
 }
 
 function isendoftheMonth(){

@@ -20,6 +20,15 @@ async function load() {
 let pot;
 let currencyLabel;
 let currency = 0;
+const eventEmitter = new EventEmitter();
+
+
+// add an event listener to the event emitter, that is called when the event is triggered
+eventEmitter.on('seasonCycle', () => { console.log('seasonCycle has triggerd!!') });
+
+
+// somewhere else with access to eventEmitter can trigger the event when necessary
+eventEmitter.trigger('seasonCycle');
 
 // use this function to initialize anything
 function preUpdate() {
