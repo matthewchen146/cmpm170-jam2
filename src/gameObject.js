@@ -190,6 +190,19 @@ class GameObject {
         return this;
     }
 
+    getAttribute(key) {
+        return this.element.getAttribute(key);
+    }
+
+    setProperty(key, value) {
+        this.element[key] = value;
+        return this;
+    }
+
+    getProperty(key) {
+        return this.element[key];
+    }
+
     setStyle(key, value) {
         this.element.style[key] = value;
         return this;
@@ -320,13 +333,19 @@ class DraggableGameObject extends GameObject {
         this.snapDistance = 100;
         this.homeChangeDistance = 100;
 
+        this.transitionSpeed = .1;
+
         this.isDragging = false;
+        this.isDragEnabled = true;
 
         this.xAxisLocked = false;
         this.yAxisLocked = false;
-
+        
+        this.element.draggable = false;
         this.addEventListener('mousedown', (e) => {
-            this.isDragging = true;
+            if (this.isDragEnabled) {
+                this.isDragging = true;
+            }
             this.dragPosition.set(this._position);
             this.targetPosition.set(this._position);
         });
@@ -364,12 +383,12 @@ class DraggableGameObject extends GameObject {
 
         this.setAnimationUpdateFunction(() => {
 
-            if (this.isDragging) {
-                this.translate(this.targetPosition.copy().sub(this._position).mul(.1));
+            if (this.isDragging && this.isDragEnabled) {
+                this.translate(this.targetPosition.copy().sub(this._position).mul(this.transitionSpeed));
             } else {
                 if (this.homeId) {
                     const targetPos = this.getSnapPosition(this.homeId);
-                    this.translate(targetPos.copy().sub(this._position).mul(.1));
+                    this.translate(targetPos.copy().sub(this._position).mul(this.transitionSpeed));
                 }   
             }
             
@@ -449,6 +468,20 @@ class DraggableGameObject extends GameObject {
         this.yAxisLocked = bool;
         return this;
     }
+
+    // set the animation / transition speed of the object
+    // this affects how it lerps toward the drag position or snap position
+    // 1 - moves instantly
+    // 0 - doesnt move 
+    setTransitionSpeed(speed) {
+        this.transitionSpeed = Math.max(0, Math.min(1, speed));
+        return this;
+    }
+
+    setDragEnabled(bool) {
+        this.isDragEnabled = bool;
+        return this;
+    }
 }
 
 
@@ -457,6 +490,7 @@ class ImageGameObject extends GameObject {
         options.tag = 'img';
         super(options);
 
+        this.addEventListener('dragstart', (e) => {e.preventDefault();});
         this.setAttribute('src', options.src);
     }
 }

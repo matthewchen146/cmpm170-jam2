@@ -18,12 +18,13 @@ async function load() {
 }
 
 let pot;
-let ingredientsContainer;
 let currencyLabel;
 let currency = 0;
 
 // use this function to initialize anything
 function preUpdate() {
+
+    const uiObjects = initializeUI();
 
     // creates an image object, which is an extension of gameobject
     // takse a src option, which is the path to the image
@@ -35,23 +36,7 @@ function preUpdate() {
     currencyLabel = new GameObject({element: document.querySelector('#currency')});
 
 
-    // gets / creates ingredients container, and creates a draggableGameObject 
-    ingredientsContainer = new DraggableGameObject({element: document.querySelector('#ingredients')})
-        .setPosition(0, gameContainer.rect.height)
-        .setOrigin(0,1)
-        .addSnapPosition('bot', 0, gameContainer.rect.height)
-        .addSnapPosition('top', 0, 100)
-        .setHomeSnapPositionId('bot')
-        .setSnapDistance(50)
-        .setHomeChangeDistance(gameContainer.rect.height / 2)
-        .setXAxisLock(true)
     
-    const cuttingBoard = new GameObject()
-        .setSize(450, 500)
-        .setOrigin(.5, 0)
-        .setParent(ingredientsContainer)
-        .setPosition(gameContainer.centerX, 120)
-    cuttingBoard.getElement().textContent = 'cutting board!'
 }
 
 
@@ -72,7 +57,7 @@ function update(delta, time) {
     currency += delta / 1000;
 
     // set currency text in currency label
-    currencyLabel.getElement().textContent = `${currency.toFixed(2)} catnip`;
+    currencyLabel.setProperty('textContent', `${currency.toFixed(2)} catnip`);
 
 }
 
