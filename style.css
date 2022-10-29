@@ -18,6 +18,9 @@ main {
     /* background-color: lightcoral; */
     border: solid 2px black;
     position: relative;
+
+    user-select: none;
+    overflow: hidden;
 }
 
 /* makes the */
@@ -49,6 +52,7 @@ main {
     display: flex;
     justify-content: space-between;
     /* grid-template-columns: repeat(4, 1fr); */
+    /* transition: bottom 100ms; */
 }
 
 #ingredients > div {
