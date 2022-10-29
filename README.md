@@ -28,6 +28,14 @@ const object = new GameObject({
 This will create a new div and append it to the document's body.
 GameObject has many helper functions to make moving elements around easier.
 - **setPosition(x, y)** - Set the position of the GameObject. The position mode should be ABSOLUTE.
+- **translate(x, y)** - Offset the position.
+- **setRotation(angle)** - Set the rotation to *angle* radians. Internally it uses the transform style.
+- **rotate(angle)** - Offset the rotation by angle.
+- **setScale(x, y)** - Set the scale. Internally it uses the transform style. Does not affect the width or height.
+- **scale(x, y)** - Offset the scale.
+- **setSize(w, h)** - Set the size of the element in pixels.
+- **setOrigin(x, y)** - Set the origin of the element. This moves the pivot point based on x and y. Default is 0,0 (TOPLEFT), and an example of center is .5,.5
+Position, rotation, scale, size, and origin have equivalent **getProperty()** methods.
 - **setPositionMode(mode)** - Set the position mode from GameObject.PositionModes.
 - **setAttribute(key, value)** - Set the attribute *key* with value *value*.
 - **setStyle(key, value)** - Set the attribute *key* with value *value*.
