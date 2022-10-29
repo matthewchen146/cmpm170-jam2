@@ -45,8 +45,14 @@ class EventEmitter {
 
     trigger(eventName) {
         const callbackArray = this.events[eventName] || [];
-        callbackArray.forEach((callback) => {
+        for (let i = 0; i < callbackArray.length; i++) {
+            const {callback, once} = callbackArray[i];
             callback();
-        })
+            if (once) {
+                callbackArray.splice(i, 1);
+                i -= 1;
+            }
+        }   
+        
     }
 }
