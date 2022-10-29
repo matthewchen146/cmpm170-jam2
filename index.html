@@ -1,19 +1,42 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Lala Land</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css" />
+    <title>Game</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Pumpkin Eat Witch : <spam class="playerPumpkimCount"></span><h1>
-    <div class = "calender"></div> 
-        <p id= "game-time"> Time: </p>
-    <div class = "material">
-        <p id= "pumpkin-gain"> Pumpkin: </p>
-   
+    <main>
+
+        <div id="game-container">
+
+            <div id="game-object-container">
+            </div>
+
+            <div id="ui-container">
+                <div id="stats">
+                    <div id="season">Season</div>
+                    <div id="currency">Currency</div>
+                    <div id="potion">Potion</div>
+                </div>
+
+                <div id="ingredients">
+                    <div>Apple</div>
+                    <div>Pumpkin</div>
+                    <div>Corn</div>
+                    <div>Berries</div>
+                </div>
+            </div>
+
+        </div>
+
+        
+
+    </main>
+
+    <script src="./src/gameEngine.js"></script>
+    <script src="./src/gameObject.js"></script>
+    <script src="./main.js"></script>
 </body>
-<script src="./main.js"></script>
 </html>

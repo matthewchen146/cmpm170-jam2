@@ -1,5 +1,58 @@
-*{
+* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+
+main {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    width: 500px;
+    height: 700px;
+    /* background-color: lightcoral; */
+    border: solid 2px black;
+    position: relative;
+}
+
+/* makes the */
+#game-object-container,
+#ui-container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+#stats {
+    display: flex;
+    justify-content: space-between;
+}
+
+#stats > div {
+    width: 100px;
+    height: 50px;
+    background-color: lightcoral;
+    text-align: center;
+}
+
+/* contains the ingredients */
+#ingredients {
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    /* grid-template-columns: repeat(4, 1fr); */
+}
+
+#ingredients > div {
+    height: 100px;
+    width: 100px;
+    background-color: lightsalmon;
 }

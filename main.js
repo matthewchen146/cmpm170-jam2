@@ -1,127 +1,53 @@
-var SPEED = 1000;
 
-var gameCalender= {
-    year: 1,
-    month: 1,
-    day: 1,
-    hour: 1
+// sets the GameObject static default container to the selected container below
+GameObject.defaultContainer = document.querySelector('#game-object-container');
+
+// gameContainer information, for easy access
+const gameContainer = {
+    element: GameObject.defaultContainer,
+    rect: GameObject.defaultContainer.getBoundingClientRect()
+}
+gameContainer.centerX = gameContainer.rect.width / 2;
+gameContainer.centerY = gameContainer.rect.height / 2;
+
+
+// use this function to load things like assets
+// it is asynchronous so it can use Promises
+async function load() {
+
 }
 
-var playerItem = {
-    pumpkin: 1,
-    secEarnPumpkin: 1,
-    inventory: {}
+
+// use this function to initialize anything
+function preUpdate() {
+
+    // creates an image object, which is an extension of gameobject
+    // takse a src option, which is the path to the image
+    const pot = new Image({src: './assets/pot.png'})
+        .setStyle('width', '300px')
+        .setStyle('height', '300px')
+        .setPosition(gameContainer.centerX - 150, 400)
 }
 
-function wantPumpkin(){
-    playerItem.pumpkin += playerItem.secEarnPumpkin;
-    constructPumpkin();
+
+// use this function as the main game loop
+// delta is the time since the last frame, in ms
+// time is the total time the game has been running, in ms
+function update(delta, time) {
+
+    // to test this works, here is a line that logs the delta and game time
+    console.log(delta, (time / 1000).toFixed(1))
+
 }
 
-var gameClock = setInterval(function(){
-    addHour();
 
-}, SPEED);
+// set up engine with the appropriate functions
+// see ./src/gameEngine.js for more information
+const engine = new GameEngine({
+    load: load,
+    preUpdate: preUpdate,
+    update: update
+})
 
-function addHour(){
-    if (gameCalender.hour !== 24){
-        gameCalender.hour++
-    }
-    else {
-        gameCalender.hour = 1;
-        addDay();
-    }
-    console.log("Hour is now: " + gameCalender.hour);
-    constructCalender();
-    wantPumpkin() ;
-};
-
-function addDay(){
-    var endoftheMonth = isendoftheMonth();
-    console.log("this is the end of the month: ", endoftheMonth)
-    if (endoftheMonth === false){
-        gameCalender.day++;
-    }
-    else{
-        gameCalender.day = 1;
-        addMonth();
-    }
-    console.log("Day is now: " + gameCalender.hour);
-    constructCalender()
-}
-
-function addMonth(){
-    if(gameCalender.month !== 12){
-        gameCalender.month++;
-    }
-    else{
-        gameCalender.month = 1;
-        gameCalender.year++;
-    }
-    
-    constructCalender()
-}
-
-//constructor functions
-function constructCalender(){
-    var timeSection = document.getElementById('game-time');
-
-    var timeMessage = " Year: " + gameCalender.year + " Month: " + gameCalender.month  + 
-    " Day: " + gameCalender.day+ " Hour: " + gameCalender.hour; 
-
-    timeSection.innerText = timeMessage;
-}
-function constructPumpkin(){
-    var pumpkinSection = document.getElementById('pumpkin-gain');
-
-    var pumpkinMessage = "Pumpkin: " + playerItem.pumpkin;
-    
-    pumpkinSection = pumpkinMessage;
-}
-
-function isendoftheMonth(){
-        var endoftheMonth = false;
-
-    switch (true){
-        case(gameCalender.month === 1 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 2 && gameCalender.day === 28):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 3 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 4 && gameCalender.day === 30):
-            endoftheMonth = true;
-            break;  
-        case(gameCalender.month === 5 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 6 && gameCalender.day === 30):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 7 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break; 
-        case(gameCalender.month === 8 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 9 && gameCalender.day === 30):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 10 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break;
-        case(gameCalender.month === 11 && gameCalender.day === 30):
-            endoftheMonth = true;
-            break;  
-        case(gameCalender.month === 12 && gameCalender.day === 31):
-            endoftheMonth = true;
-            break;
-        default:
-            endoftheMonth = false; 
-    }
-
-    return endoftheMonth;
-}
+// start the engine
+engine.start();
