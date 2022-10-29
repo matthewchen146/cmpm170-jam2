@@ -10,7 +10,7 @@
  *     const vecCopy = new Vector2(vec);
  */
 class Vector2 {
-    constructor(x, y) {
+    constructor(x = 0, y = 0) {
         this.set(x, y);
     }
 
@@ -54,25 +54,15 @@ class Vector2 {
         return this;
     }
 
-    mul(x, y) {
-        if (x instanceof Object) {
-            this.x *= x.x;
-            this.y *= x.y;
-        } else {
-            this.x *= x;
-            this.y *= y;
-        }
+    mul(v) {
+        this.x *= v;
+        this.y *= v;
         return this;
     }
 
-    div(x, y) {
-        if (x instanceof Object) {
-            this.x /= x.x;
-            this.y /= x.y;
-        } else {
-            this.x /= x;
-            this.y /= y;
-        }
+    div(v) {
+        this.x /= v;
+        this.y /= v;
         return this;
     }
 

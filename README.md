@@ -54,6 +54,6 @@ const object = new GameObject()
 ```
 
 
-### Image *extends GameObject*
-Image takes the same options as GameObject, with some extra options:
+### ImageGameObject *extends GameObject*
+ImageGameObject takes the same options as GameObject, with some extra options:
 - **src** - A string path from the root folder. This is the image source.

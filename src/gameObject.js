@@ -12,50 +12,79 @@ class GameObject {
 
     // the default container/parent for created elements
     static defaultContainer = document.body;
+    
+    // the default that updates game objects
+    static defaultEngine;
 
     constructor(options = {}) {
 
-        this.element = options.element || (options.tag ? document.createElement(options.tag) : undefined) || document.createElement('div');
-
-        this.parent = options.parent || options.container || GameObject.defaultContainer;
-
-        if (!this.element.parent && this.parent) {
-            this.parent.appendChild(this.element);
-        }
-
-        this._position = {x: 0, y: 0};
-        this._size = {w: 0, h: 0};
-        this._origin = {x: 0, y: 0};
+        // orientation and display vectors
+        this._position = new Vector2();
+        this._size = new Vector2();
+        this._origin = new Vector2();
 
         // rotation in radians
         this._rotation = 0;
 
         // scale, does not affect the actual size
-        this._scale = {x: 1, y: 1};
+        this._scale = new Vector2(1, 1);
 
-        this.setPosition(this._position.x, this._position.y);
-        this.setSize(this._size.w, this._size.h);
-        this.setOrigin(this._origin.x, this._origin.y);
+        this.positionMode = GameObject.PositionModes.ABSOLUTE;
 
-        this.positionMode;
-        this.setPositionMode(options.positionMode || GameObject.PositionModes.ABSOLUTE);
+        this.parent;
+        this.element = options.element || (options.tag ? document.createElement(options.tag) : undefined) || document.createElement('div');
+        
+        // check if the element is in the document already
+        if (this.element.isConnected) {
+            this.parent = options.parent || options.container;
+            
+            if (this.parent) {
+                this.setParent(this.parent);
+            } else {
+                this.parent = this.element.parentElement;
+            }
+
+            // convert client rect into absolute positions
+            const rect = this.element.getBoundingClientRect();
+            this.setSize(rect.width, rect.height);
+        } else {
+            this.parent = options.parent || options.container || GameObject.defaultContainer;
+
+            if (this.parent) {
+                this.setParent(this.parent);
+            }
+
+            this.setPosition(this._position.x, this._position.y);
+            this.setSize(this._size.x, this._size.y);
+            this.setOrigin(this._origin.x, this._origin.y);
+
+            this.setPositionMode(options.positionMode || GameObject.PositionModes.ABSOLUTE);
+        }
+
+        this.updateFunction;
+
+        this.engine = options.engine || GameObject.defaultEngine;
+        if (this.engine) {
+            this.engine.addGameObject(this);
+        }
+
+        this.isDestroyed = false;
     }
 
     // set the position of the element.
     setPosition(x = this._position.x, y = this._position.y) {
-        this._position.x = x;
-        this._position.y = y;
-        let absoluteX = this._position.x - this._origin.x * this._size.w;
-        let absoluteY = this._position.y - this._origin.y * this._size.h;
+        this._position.set(x, y);
+        let absoluteX = this._position.x - this._origin.x * this._size.x;
+        let absoluteY = this._position.y - this._origin.y * this._size.y;
 
-        if (this.positionMode === GameObject.PositionModes.RELATIVE) {
-            if (!this.parent) {
-                this.parent = this.element.parent;
-            }
-            const parentRect = this.parent.getBoundingClientRect();
-            absoluteX += parentRect.left;
-            absoluteY += parentRect.top;
-        }
+        // if (this.positionMode === GameObject.PositionModes.RELATIVE) {
+        //     if (!this.parent) {
+        //         this.parent = this.element.parent;
+        //     }
+        //     const parentRect = this.parent.getBoundingClientRect();
+        //     absoluteX += parentRect.left;
+        //     absoluteY += parentRect.top;
+        // }
 
         this.setStyle('left', absoluteX);
         this.setStyle('top', absoluteY);
@@ -63,12 +92,16 @@ class GameObject {
     }
 
     getPosition() {
-        return this._position;
+        return this._position.copy();
     }
 
     // translates the object from the current position by x
     translate(x = 0, y = 0) {
-        this.setPosition(this._position.x + x, this._position.y + y);
+        if (x instanceof Object) {
+            this.setPosition(this._position.x + x.x, this._position.y + x.y);
+        } else {
+            this.setPosition(this._position.x + x, this._position.y + y);
+        }
         return this;
     }
 
@@ -104,46 +137,48 @@ class GameObject {
 
     // set the scale
     setScale(x = this._scale.x, y = this._scale.y) {
-        this._scale.x = x;
-        this._scale.y = y;
+        this._scale.set(x, y);
         this.updateTransform();
         return this;
     }
 
     getScale() {
-        return this._scale;
+        return this._scale.copy();
     }
 
     // scale by an amount
     scale(x = 0, y = 0) {
-        return this.setScale(this._scale.x + x, this._scale.y + y);
+        if (x instanceof Object) {
+            this.setScale(this._scale.x + x.x, this._scale.y + x.y);
+        } else {
+            this.setScale(this._scale.x + x, this._scale.y + y);
+        }
+        return this;
     }
 
     // set the size of the element, in pixels
-    setSize(w = this._size.w, h = this._size.h) {
-        this._size.w = w;
-        this._size.h = h;
-        this.setStyle('width', this._size.w);
-        this.setStyle('height', this._size.h);
+    setSize(x = this._size.x, y = this._size.y) {
+        this._size.set(x, y);
+        this.setStyle('width', this._size.x);
+        this.setStyle('height', this._size.y);
         this.setPosition(this._position.x, this._position.y);
         return this;
     }
 
     getSize() {
-        return this._size;
+        return this._size.copy();
     }
 
     // the origin is ranges of 0, representing the pivot of the element
     // by default, it is the top left (0,0)
     setOrigin(x = this._origin.x, y = this._origin.y) {
-        this._origin.x = x;
-        this._origin.y = y;
+        this._origin.set(x, y);
         this.setPosition(this._position.x, this._position.y);
         return this;
     }
 
     getOrigin() {
-        return this._origin;
+        return this._origin.copy();
     }
 
     getElement() {
@@ -193,7 +228,7 @@ class GameObject {
     }
 
     setParent(parent) {
-        if (this.parent) {
+        if (this.parent && this.element.parentElement === this.parent) {
             this.parent.removeChild(this.element);
         }
         if (parent instanceof GameObject) {
@@ -228,13 +263,196 @@ class GameObject {
         return this;
     }
 
+    addEventListener(eventName, callback) {
+        this.element.addEventListener(eventName, callback);
+        return this;
+    }
+
+    // set the update function for this
+    setUpdate(func) {
+        this.updateFunction = func;
+        return this;
+    }
+
+    update(...args) {
+        if (this.updateFunction) {
+            this.updateFunction(...args);
+        }
+        if (this.animationUpdateFunction) {
+            this.animationUpdateFunction(...args);
+        }
+        return this;
+    }
+
+    setAnimationUpdateFunction(func) {
+        this.animationUpdateFunction = func;
+        return this;
+    }
+
+    destroy() {
+        this.isDestroyed = true;
+        return this;
+    }
 
     static setDefaultContainer(container) {
         this.defaultContainer = container;
     }
 }
 
-class Image extends GameObject {
+/**
+ * 
+ * DraggableGameObject is a GameObject that can be dragged
+ * 
+ * 
+ */
+class DraggableGameObject extends GameObject {
+    constructor(options = {}) {
+        super(options);
+
+        this.snapPositionMap = {};
+        this.snapPositions = [];
+
+        this.homeId;
+        this.currentId;
+        this.targetPosition = new Vector2();
+        this.dragPosition = new Vector2();
+
+        this.snapDistance = 100;
+        this.homeChangeDistance = 100;
+
+        this.isDragging = false;
+
+        this.xAxisLocked = false;
+        this.yAxisLocked = false;
+
+        this.addEventListener('mousedown', (e) => {
+            this.isDragging = true;
+            this.dragPosition.set(this._position);
+            this.targetPosition.set(this._position);
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!this.isDragging) {
+                return;
+            }
+            const gameRect = GameObject.defaultContainer.getBoundingClientRect();
+
+            this.dragPosition.set(
+                !this.xAxisLocked ? e.clientX - gameRect.x : this._position.x, 
+                !this.yAxisLocked ? e.clientY - gameRect.y : this._position.y
+            );
+            const closestId = this.getClosestSnapPositionId();
+            const closestPos = this.getSnapPosition(closestId);
+            const dist = closestPos.distanceTo(this.dragPosition);
+            if (dist < this.snapDistance) {
+                this.targetPosition.set(closestPos);
+            } else {
+                this.targetPosition.set(this.dragPosition);
+            }
+
+            if (dist < this.homeChangeDistance) {
+                this.currentId = closestId;
+            } else {
+                this.currentId = undefined;
+            }
+        });
+        window.addEventListener('mouseup', (e) => {
+            this.isDragging = false;
+            if (this.currentId) {
+                this.homeId = this.currentId;
+            }
+        });
+
+        this.setAnimationUpdateFunction(() => {
+
+            if (this.isDragging) {
+                this.translate(this.targetPosition.copy().sub(this._position).mul(.1));
+            } else {
+                if (this.homeId) {
+                    const targetPos = this.getSnapPosition(this.homeId);
+                    this.translate(targetPos.copy().sub(this._position).mul(.1));
+                }   
+            }
+            
+
+        });
+    }
+
+    // add a snap position with an id
+    addSnapPosition(id, x, y) {
+        if (this.getSnapPosition(id)) {
+            console.error(`snap position with id ${id} already exists`);
+            return;
+        }
+        const pos = new Vector2(x, y);
+        this.snapPositionMap[id] = pos;
+        this.snapPositions.push({
+            pos,
+            id
+        });
+        return this;
+    }
+
+    setSnapPosition(id, x, y) {
+        this.snapPositionMap[id]?.set(x, y);
+        return this;
+    }
+
+    getSnapPosition(id) {
+        return this.snapPositionMap[id];
+    }
+
+    getClosestSnapPosition() {
+        const closestId = this.getClosestSnapPositionId();
+        return this.snapPositionMap[closestId];
+    }
+
+    getClosestSnapPositionId() {
+        let closest;
+        let closestDist;
+        for (const {id, pos} of this.snapPositions) {
+            const dist = this._position.distanceTo(pos);
+            if (!closest || dist < closestDist) {
+                closest = id;
+                closestDist = dist;
+            }
+        }
+        return closest;
+    }
+
+    clearSnapPositions() {
+        this.snapPositionMap = {}
+        this.snapPositions = [];
+        return this;
+    }
+
+    setSnapDistance(d) {
+        this.snapDistance = d;
+        return this;
+    }
+
+    setHomeChangeDistance(d) {
+        this.homeChangeDistance = d;
+        return this;
+    }
+
+    setHomeSnapPositionId(id) {
+        this.homeId = id;
+        return this;
+    }
+
+    setXAxisLock(bool) {
+        this.xAxisLocked = bool;
+        return this;
+    }
+
+    setYAxisLock(bool) {
+        this.yAxisLocked = bool;
+        return this;
+    }
+}
+
+
+class ImageGameObject extends GameObject {
     constructor(options = {}) {
         options.tag = 'img';
         super(options);

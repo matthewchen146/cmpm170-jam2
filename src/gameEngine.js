@@ -36,6 +36,9 @@ class GameEngine {
 
         // the update function is absolutely necessary
         this.updateFunction = options.updateFunction || options.update;
+
+        // array of game objects to update
+        this.gameObjects = [];
     }
 
     // start the engine. this is asynchronous
@@ -104,13 +107,22 @@ class GameEngine {
         const now = Date.now();
         const delta = now - this.updateTimestamp;
         const time = this.gameElapsedTime;
-        this.realElapsedTime = now - this.gameStartTime;
+        this.fullElapsedTime = now - this.gameStartTime;
 
         // if not paused, the update function will be called, and the game elapsed time will increase
         // if paused, the update function will not be called, and the game elapsed time will freeze
         if (this.updateFunction && !this.isPaused) {
             this.gameElapsedTime += delta;
-            this.updateFunction(delta, time, this.realElapsedTime);
+            this.updateFunction(delta, time, this.fullElapsedTime);
+
+            for (let i = 0; i < this.gameObjects.length; i++) {
+                const object = this.gameObjects[i];
+                if (false) {
+
+                } else {
+                    object.update(delta, time, this.fullElapsedTime);
+                }
+            }
         }
         this.updateTimestamp = now;
 
@@ -120,4 +132,9 @@ class GameEngine {
             this.updateTimeout = setTimeout(this.updateCaller.bind(this), delay);
         }
     }
+
+    addGameObject(gameObject) {
+        this.gameObjects.push(gameObject);
+        return this;
+    } 
 }
