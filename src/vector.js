@@ -96,6 +96,31 @@ class Vector2 {
         this.div(mag, mag);
         return this;
     }
+
+    // return dot product with vector x y
+    dot(x, y) {
+        if (x instanceof Object) {
+            return this.x * x.x + this.y * x.y;
+        } else {
+            return this.x * x + this.y * y;
+        }
+    }
+
+    // get the percent of the closest point between start and end from point
+    static closestPointPercent(start, end, point) {
+        const startToEnd = end.copy().sub(start);
+        const startToPoint = point.copy().sub(start);
+        const dot = startToEnd.dot(startToPoint);
+        const length = startToEnd.magnitude();
+        return dot / (length * length);
+    }
+
+    // get closest point on a vector between start and end from point
+    static closestPoint(start, end, point) {
+        const startToEnd = end.copy().sub(start);
+        const t = closestPointPercent(start, end, point);
+        return start.copy().add(startToEnd.mul(t));
+    }
 }
 
 // function for easyily creating new vectors
