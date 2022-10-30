@@ -21,6 +21,8 @@ main {
 
     user-select: none;
     overflow: hidden;
+
+    pointer-events: none;
 }
 
 /* makes the */
@@ -29,6 +31,13 @@ main {
     position: absolute;
     height: 100%;
     width: 100%;
+
+    pointer-events: none;
+}
+
+#game-object-container *,
+#ui-container * {
+    pointer-events: auto;
 }
 
 #stats {
@@ -44,7 +53,7 @@ main {
 }
 
 /* contains the ingredients */
-#ingredients {
+#old-ingredients {
     text-align: center;
     position: absolute;
     bottom: 0;
@@ -56,8 +65,16 @@ main {
     /* transition: bottom 100ms; */
 }
 
-#ingredients > div {
+/* #ingredients > div {
     height: 100px;
     width: 100px;
     background-color: lightsalmon;
+} */
+
+
+
+/* styling for recipe book pages */
+
+.recipe-book-page {
+    font-size: larger;
 }

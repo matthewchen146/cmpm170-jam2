@@ -19,8 +19,16 @@ class GameObject {
     constructor(options = {}) {
 
         // orientation and display vectors
+
+        // current position represents the current displayed position
+        // this is because in a transition, it can take time for the displayed position to reach the target position
         this._currentPosition = new Vector2();
+
+        // this position represents the target postition
         this._position = new Vector2();
+
+        // plan to implement transition for sizing too?
+        // this._currentSize = new Vector2();
         this._size = new Vector2();
         this._origin = new Vector2();
 
@@ -34,6 +42,8 @@ class GameObject {
 
         this.parent;
         this.element = options.element || (options.tag ? document.createElement(options.tag) : undefined) || document.createElement('div');
+        this.element.isGameObject = true;
+        this.element.gameObject = this;
         
         // check if the element is in the document already
         if (this.element.isConnected) {
@@ -69,6 +79,8 @@ class GameObject {
             this.engine.addGameObject(this);
         }
 
+        this.isVisible = true;
+        this.setVisible(this.isVisible);
         this.isDestroyed = false;
 
         this.transitionSpeed = .1;
@@ -89,6 +101,24 @@ class GameObject {
 
         // event emitter for this object
         this.events = new EventEmitter();
+    }
+
+    // changes the visibility of the element
+    // specifically, it changes the display style
+    // this will hide all children as well
+    // to set the "visibility" style, it can be set manually with setStyle
+    setVisible(bool) {
+        this.isVisible = bool;
+        if (this.isVisible) {
+            this.setStyle('display', '');
+        } else {
+            this.setStyle('display', 'none');
+        }
+        return this;
+    }
+
+    getVisible() {
+        return this.isVisible;
     }
 
     // used internally. do not call for your own sake!
@@ -243,8 +273,21 @@ class GameObject {
         return this.element[key];
     }
 
+    // style setters
     setStyle(key, value) {
         this.element.style[key] = value;
+        return this;
+    }
+
+    // style setter helper
+    setBackgroundColor(color) {
+        this.element.style.backgroundColor = color;
+        return this;
+    }
+
+    // text content helper
+    setText(text) {
+        this.element.textContent = text;
         return this;
     }
 
@@ -314,6 +357,19 @@ class GameObject {
             this.element.removeChild(child);
         }
         return this;
+    }
+
+    // returns an array of this element's children.
+    // if a child element is wrapped with GameObject, it will map to the GameObject instead of the element
+    // if this behavior is unwanted, set elementsOnly to true
+    getChildren(elementsOnly = false) {
+        return Array.from(this.element.children).map((element) => {
+            if (element.isGameObject && !elementsOnly) {
+                return element.gameObject;
+            } else {
+                return element;
+            }
+        })
     }
 
     addEventListener(eventName, callback) {
@@ -580,12 +636,44 @@ class DraggableGameObject extends GameObject {
 }
 
 
+
+
+class ButtonGameObject extends GameObject {
+    constructor(options = {}) {
+        super(options);
+
+        // default settings for convenience
+        this.setOrigin(.5, .5);
+        this.setSize(50, 30);
+        this.setText('button');
+        this.setBackgroundColor('lightgray');
+
+        this.clickCallback;
+
+        const handleClick = (e) => {
+            if (this.clickCallback) {
+                this.clickCallback(e);
+            }
+        }
+        
+        this.addEventListener('click', handleClick);
+    }
+
+    setClickCallback(callback) {
+        this.clickCallback = callback;
+        return this;
+    }
+}
+
+
+
+
+
 class ImageGameObject extends GameObject {
     constructor(options = {}) {
         options.tag = 'img';
         super(options);
 
-        this.addEventListener('dragstart', (e) => {e.preventDefault();});
         this.setAttribute('src', options.src);
     }
 }
