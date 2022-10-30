@@ -359,6 +359,7 @@ class DraggableGameObject extends GameObject {
         this.homeChangeDistance = 100;
 
         this.transitionSpeed = .1;
+        this.isTransitionEnabled = true;
 
         this.isDragging = false;
         this.isDragEnabled = true;
@@ -373,7 +374,7 @@ class DraggableGameObject extends GameObject {
             }
             this.dragPosition.set(this._position);
             this.targetPosition.set(this._position);
-            this.events.trigger('dragstart', this.dragPosition.copy());
+            this.events.trigger('dragstart', {object: this, position: this.dragPosition.copy(), id: this.homeId});
         });
         window.addEventListener('mousemove', (e) => {
             if (!this.isDragging) {
@@ -399,14 +400,14 @@ class DraggableGameObject extends GameObject {
             } else {
                 this.currentId = undefined;
             }
-            this.events.trigger('dragging', this.dragPosition.copy());
+            this.events.trigger('dragging', {object: this, position: this.dragPosition.copy(), id: this.currentId});
         });
         window.addEventListener('mouseup', (e) => {
             this.isDragging = false;
             if (this.currentId) {
                 this.homeId = this.currentId;
             }
-            this.events.trigger('dragend', this.homeId);
+            this.events.trigger('dragend', {object: this, position: this.dragPosition.copy(), id: this.homeId});
         });
 
         this.setAnimationUpdateFunction(() => {
@@ -414,9 +415,11 @@ class DraggableGameObject extends GameObject {
             if (this.isDragging && this.isDragEnabled) {
                 this.translate(this.targetPosition.copy().sub(this._position).mul(this.transitionSpeed));
             } else {
-                if (this.homeId) {
+                if (this.homeId && this.isTransitionEnabled) {
                     const targetPos = this.getSnapPosition(this.homeId);
-                    this.translate(targetPos.copy().sub(this._position).mul(this.transitionSpeed));
+                    if (targetPos) {
+                        this.translate(targetPos.copy().sub(this._position).mul(this.transitionSpeed));
+                    }
                 }   
             }
             
@@ -506,9 +509,27 @@ class DraggableGameObject extends GameObject {
         return this;
     }
 
+    setTransitionEnabled(bool) {
+        this.isTransitionEnabled = bool;
+        return this;
+    }
+
     setDragEnabled(bool) {
         this.isDragEnabled = bool;
         return this;
+    }
+
+    // get the percentage from the current dragPosition to the specified id position
+    percentTo(id) {
+        const targetPos = this.snapPositionMap[id];
+        const homePos = this.snapPositionMap[this.homeId];
+        if (!targetPos || !homePos) {
+            return;
+        }
+
+        const dist = this.dragPosition.distanceTo(targetPos);
+        const totalDist = targetPos.distanceTo(homePos);
+        return dist / totalDist;
     }
 }
 

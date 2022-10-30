@@ -15,7 +15,7 @@ class Vector2 {
     }
 
     // set the vector
-    set(x, y) {
+    set(x = this.x, y = this.y) {
         if (x instanceof Object) {
             this.x = x.x;
             this.y = x.y;
