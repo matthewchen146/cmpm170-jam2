@@ -101,6 +101,10 @@ class GameObject {
 
         // event emitter for this object
         this.events = new EventEmitter();
+
+        // prevents the default drag behavior
+        // this will prevent image elements from being ghost dragged
+        this.element.draggable = false;
     }
 
     // changes the visibility of the element
@@ -470,7 +474,6 @@ class DraggableGameObject extends GameObject {
         this.xAxisLocked = false;
         this.yAxisLocked = false;
         
-        this.element.draggable = false;
         this.addEventListener('mousedown', (e) => {
             if (this.isDragEnabled) {
                 this.isDragging = true;
