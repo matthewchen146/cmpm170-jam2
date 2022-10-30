@@ -1,28 +1,38 @@
-// ermm.. this will hold some ui things
+
+// let testDrag
+
+let uiInitialized = false;
 
 // initialize the ui
 // returns an object containing relevant GameObjects
 function initializeUI() {
+
+    if (uiInitialized) {
+        return;
+    }
 
     // stores the ui GameObjects in here
     const uiObjects = {};
 
     const uiContainer = document.querySelector('#ui-container');
 
-    // gets / creates ingredients container, and creates a draggableGameObject 
-    const ingredientsContainer = new DraggableGameObject({element: document.querySelector('#ingredients')})
-        .setPosition(0, gameContainer.rect.height)
-        .setOrigin(0,1)
-        .addSnapPosition('bot', 0, gameContainer.rect.height)
-        .addSnapPosition('top', 0, 100)
-        .setHomeSnapPositionId('bot')
-        .setSnapDistance(50)
-        .setHomeChangeDistance(gameContainer.rect.height / 2)
-        .setDragEnabled(false)
-        .setXAxisLock(true)
+    // testDrag = new DraggableGameObject({container: uiContainer})
+    // .setSize(100, 100)
+    // .setStyle('backgroundColor', 'coral')
+    // .setOrigin(.5, .5)
+
+    // gets / creates ingredients container as a new GameObject
+    const ingredientsContainerTop = 50;
+    const ingredientsContainerBottom = gameContainer.rect.height - 50;
+
+    const ingredientsContainer = new GameObject({element: document.querySelector('#ingredients')})
+        .setPosition(0, ingredientsContainerBottom)
+        .setOrigin(0, .5)
     
     uiContainer.ingredientsContainer = ingredientsContainer;
 
+
+    // creates cutting board GameObject as a div
     const cuttingBoard = new GameObject()
         .setSize(450, 500)
         .setOrigin(.5, 0)
@@ -30,26 +40,32 @@ function initializeUI() {
         .setPosition(gameContainer.centerX, 120)
     cuttingBoard.getElement().textContent = 'cutting board!'
 
+
+    // creates ingredients / cutting board dragger, which is able to bring up the cutting board and put it down
     const ingredientsDraggerTop = 100;
     const ingredientsDraggerBottom = gameContainer.rect.height - 100;
     const ingredientsDragger = new DraggableGameObject({container: uiContainer, tag: 'img'})
         .setAttribute('src', './assets/drag-arrow.png')
         .setSize(50, 50)
         // .setStyle('backgroundColor', 'coral')
-        .setPosition(0, gameContainer.rect.height - 100)
+        .setPosition(gameContainer.centerX, gameContainer.rect.height - 100)
         .setOrigin(.5, .5)
         .addSnapPosition('bot', gameContainer.centerX, ingredientsDraggerBottom)
         .addSnapPosition('top', gameContainer.centerX, ingredientsDraggerTop)
-        .setHomeSnapPositionId('bot')
+        .setHomeId('bot')
         .setSnapDistance(10)
         .setTransitionSpeed(.5)
         .setHomeChangeDistance(gameContainer.rect.height / 2)
         .setXAxisLock(true)
         
-
     uiObjects.ingredientsDragger = ingredientsDragger;
 
+
+
+    // get the ingredients and create a draggable game object for each
     const cuttingBoardIngredients = {};
+
+    uiObjects.cuttingBoardIngredients = cuttingBoardIngredients;
 
     const ingredients = {
         'apple': './assets/apple.png',
@@ -76,39 +92,41 @@ function initializeUI() {
             .setOrigin(.5, .5)
             .setPosition(position)
             .addSnapPosition('main', position)
-            .setHomeSnapPositionId('main')
+            .setHomeId('main')
             .setSnapDistance(50)
             .setTransitionSpeed(.2)
             .setDragEnabled(false)
     })
-    
 
 
-    ingredientsDragger.on('dragstart', ({id}) => {
-        ingredientsContainer.setTransitionEnabled(false);
 
-        Object.values(cuttingBoardIngredients).forEach((ingredient) => {
-            ingredient.setTransitionEnabled(false);
-            ingredient.setSnapPosition('main', undefined, ingredientsContainer.getSnapPosition(ingredientsContainer.homeId).y - 50);
-        });
+    // drag event listeners for the ingredients dragger
+    ingredientsDragger.on('dragstart', ({}) => {
+
+        // set the main snap position for the ingredients to their home snap position
+        // might be redundant, so it is commented out
+        // Object.values(cuttingBoardIngredients).forEach((ingredient) => {
+        //     ingredient.setSnapPosition('main', undefined, ingredientsContainer.getHomePosition().y);
+        // });
     })
-    .on('dragging', ({object, position}) => {
-        // ingredientsContainer.setSnapPosition('move', undefined, position.y);
-        const targetId = object.homeId === 'bot' ? 'top' : 'bot';
+    .on('dragging', ({object, position, id}) => {
+        
+        const targetId = object.getHomeId() === 'bot' ? 'top' : 'bot';
         const percent = object.percentTo(targetId);
-        const length = ingredientsDraggerBottom - ingredientsDraggerTop + 100;
-        const y = length * (targetId === 'top' ? percent : 1 - percent) + 100;
-        ingredientsContainer.setPosition(undefined, y);
+        const length = (gameContainer.rect.height - 100);
+        const y = length * (targetId === 'top' ? 1 - percent : percent);
 
+        // move ingredient container (and cutting board) with the dragger
+        ingredientsContainer.setPosition(undefined, y + 50);
+        
+        // move ingredients up or down with the ingredient container
         Object.values(cuttingBoardIngredients).forEach((ingredient) => {
-            ingredient.setPosition(undefined, y - 50);
+            ingredient.setPosition(undefined, ingredientsContainer.getPosition(true).y);
         });
     })
     .on('dragend', ({object, position, id}) => {
-        ingredientsContainer.setTransitionEnabled(true);
-        ingredientsContainer.setSnapPosition('move', undefined, position.y)
-            .setHomeSnapPositionId(id)
-
+        
+        // rotate the dragger for effect
         if (id === 'top') {
             object.setRotation(Math.PI);
         } else {
@@ -117,34 +135,27 @@ function initializeUI() {
         
         // set ingredient properties in the new state
         Object.values(cuttingBoardIngredients).forEach((ingredient) => {
-            ingredient.setTransitionEnabled(true);
-            ingredient.setSnapPosition('main', undefined, ingredientsContainer.getSnapPosition(ingredientsContainer.homeId).y - 50);
 
+            // set the ingredients new main snap position
+            // if the ingredients are at the top (crafting mode), enable dragging
             if (id === 'top') {
+                ingredientsContainer.setPosition(undefined, ingredientsContainerTop);
+                ingredient.setSnapPosition('main', undefined, ingredientsContainerTop);
                 ingredient.setDragEnabled(true);
             } else {
+                ingredientsContainer.setPosition(undefined, ingredientsContainerBottom);
+                ingredient.setSnapPosition('main', undefined, ingredientsContainerBottom);
                 ingredient.setDragEnabled(false);
             }
+
         });
     })
-    // .addEventListener('click', () => {
-    //     if (ingredientsDragger.homeId === 'top') {
-    //         ingredientsDragger.setHomeSnapPositionId('bot');
-    //     } else {
-    //         ingredientsDragger.setHomeSnapPositionId('top');
-    //     }
 
-    //     Object.values(cuttingBoardIngredients).forEach((ingredient) => {
-    //         ingredient.setTransitionEnabled(true);
-    //         ingredient.setSnapPosition('main', undefined, ingredientsContainer.getSnapPosition(ingredientsContainer.homeId).y - 50);
 
-    //         if (ingredientsDragger.homeId === 'top') {
-    //             ingredient.setDragEnabled(true);
-    //         } else {
-    //             ingredient.setDragEnabled(false);
-    //         }
-    //     });
-    // })
+
+    // return the ui data stored in uiObjects for use in other places.
+    console.log('ui objects', uiObjects);
+    uiInitialized = true;
 
     return uiObjects;
 }
