@@ -1,5 +1,5 @@
 const SPEED = 9000;
-
+let eventCall = 0;
 let gameCalender= {
     year: 1,
     month: 3,
@@ -11,6 +11,7 @@ let gameClock = setInterval(function(){
 }, SPEED);
 
 function addMonth(){
+    
     if(gameCalender.month !== 12){
         gameCalender.month++;
     }
@@ -18,7 +19,10 @@ function addMonth(){
         gameCalender.month = 1;
         gameCalender.year++;
     }
-    
+    eventCall++;
+    if(eventCall % 3 != 0){
+        eventEmitter.trigger('seasonCycle');
+    }
 }
 
 function getSeason(){
@@ -35,7 +39,6 @@ function getSeason(){
     if(month > 12 && month < 3){
         return 'winter';
     }
-    eventEmitter.on('seasonCycle', (arg1, arg2, arg3, arg4) => { console.log('seasonCycle has triggerd!!') });
 }
 
 function isendoftheMonth(){
