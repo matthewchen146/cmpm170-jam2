@@ -19,6 +19,7 @@ class GameObject {
     constructor(options = {}) {
 
         // orientation and display vectors
+        this._currentPosition = new Vector2();
         this._position = new Vector2();
         this._size = new Vector2();
         this._origin = new Vector2();
@@ -70,16 +71,48 @@ class GameObject {
 
         this.isDestroyed = false;
 
+        this.transitionSpeed = .1;
+        this.isTransitionEnabled = true;
+        this.transitionUpdateFunction;
+
+        this.setTransitionUpdateFunction(() => {
+
+            if (this.isTransitionEnabled) {
+                this._currentPosition.add(this._position.copy().sub(this._currentPosition).mul(this.transitionSpeed));
+                // this.translate();
+            }
+            this.setAbsolutePosition(this._currentPosition);
+            
+            this.events.trigger('transitionupdate');
+
+        });
 
         // event emitter for this object
         this.events = new EventEmitter();
     }
 
+    // used internally. do not call for your own sake!
+    setAbsolutePosition(x = this._currentPosition.x, y = this._currentPosition.y) {
+        let absoluteX;
+        let absoluteY;
+        if (x instanceof Object) {
+            absoluteX = x.x;
+            absoluteY = x.y;
+        } else {
+            absoluteX = x;
+            absoluteY = y;
+        }
+        absoluteX = absoluteX - this._origin.x * this._size.x;
+        absoluteY = absoluteY - this._origin.y * this._size.y;
+        this.setStyle('left', absoluteX);
+        this.setStyle('top', absoluteY);
+        return this;
+    }
+
     // set the position of the element.
     setPosition(x = this._position.x, y = this._position.y) {
         this._position.set(x, y);
-        let absoluteX = this._position.x - this._origin.x * this._size.x;
-        let absoluteY = this._position.y - this._origin.y * this._size.y;
+        
 
         // if (this.positionMode === GameObject.PositionModes.RELATIVE) {
         //     if (!this.parent) {
@@ -90,13 +123,16 @@ class GameObject {
         //     absoluteY += parentRect.top;
         // }
 
-        this.setStyle('left', absoluteX);
-        this.setStyle('top', absoluteY);
+        if (!this.isTransitionEnabled) {
+            this._currentPosition.set(this._position);
+            this.setAbsolutePosition(this._currentPosition);
+        }
+
         return this;
     }
 
-    getPosition() {
-        return this._position.copy();
+    getPosition(absolute = false) {
+        return absolute ? this._position.copy() : this._currentPosition.copy();
     }
 
     // translates the object from the current position by x
@@ -295,14 +331,14 @@ class GameObject {
         if (this.updateFunction) {
             this.updateFunction(...args);
         }
-        if (this.animationUpdateFunction) {
-            this.animationUpdateFunction(...args);
+        if (this.transitionUpdateFunction) {
+            this.transitionUpdateFunction(...args);
         }
         return this;
     }
 
-    setAnimationUpdateFunction(func) {
-        this.animationUpdateFunction = func;
+    setTransitionUpdateFunction(func) {
+        this.transitionUpdateFunction = func;
         return this;
     }
 
@@ -332,6 +368,20 @@ class GameObject {
         return this;
     }
 
+    // set the animation / transition speed of the object
+    // this affects how it lerps toward the drag position or snap position
+    // 1 - moves instantly
+    // 0 - doesnt move 
+    setTransitionSpeed(speed) {
+        this.transitionSpeed = Math.max(0, Math.min(1, speed));
+        return this;
+    }
+
+    setTransitionEnabled(bool) {
+        this.isTransitionEnabled = bool;
+        return this;
+    }
+
     static setDefaultContainer(container) {
         this.defaultContainer = container;
     }
@@ -358,9 +408,6 @@ class DraggableGameObject extends GameObject {
         this.snapDistance = 100;
         this.homeChangeDistance = 100;
 
-        this.transitionSpeed = .1;
-        this.isTransitionEnabled = true;
-
         this.isDragging = false;
         this.isDragEnabled = true;
 
@@ -372,8 +419,8 @@ class DraggableGameObject extends GameObject {
             if (this.isDragEnabled) {
                 this.isDragging = true;
             }
-            this.dragPosition.set(this._position);
-            this.targetPosition.set(this._position);
+            this.dragPosition.set(this.getPosition());
+            this.targetPosition.set(this.getPosition());
             this.events.trigger('dragstart', {object: this, position: this.dragPosition.copy(), id: this.homeId});
         });
         window.addEventListener('mousemove', (e) => {
@@ -383,48 +430,48 @@ class DraggableGameObject extends GameObject {
             const gameRect = GameObject.defaultContainer.getBoundingClientRect();
 
             this.dragPosition.set(
-                !this.xAxisLocked ? e.clientX - gameRect.x : this._position.x, 
-                !this.yAxisLocked ? e.clientY - gameRect.y : this._position.y
+                !this.xAxisLocked ? e.clientX - gameRect.x : this.getPosition().x, 
+                !this.yAxisLocked ? e.clientY - gameRect.y : this.getPosition().y
             );
             const closestId = this.getClosestSnapPositionId();
             const closestPos = this.getSnapPosition(closestId);
-            const dist = closestPos.distanceTo(this.dragPosition);
-            if (dist < this.snapDistance) {
-                this.targetPosition.set(closestPos);
+            
+            if (closestPos) {
+
+                const dist = closestPos.distanceTo(this.dragPosition);
+                if (dist < this.snapDistance) {
+                    this.targetPosition.set(closestPos);
+                } else {
+                    this.targetPosition.set(this.dragPosition);
+                }
+
+                if (dist < this.homeChangeDistance) {
+                    this.currentId = closestId;
+                } else {
+                    this.currentId = undefined;
+                }
+
             } else {
                 this.targetPosition.set(this.dragPosition);
             }
 
-            if (dist < this.homeChangeDistance) {
-                this.currentId = closestId;
-            } else {
-                this.currentId = undefined;
-            }
+            // sets the position to the target position
+            this.setPosition(this.targetPosition)
+            
             this.events.trigger('dragging', {object: this, position: this.dragPosition.copy(), id: this.currentId});
         });
         window.addEventListener('mouseup', (e) => {
+            if (!this.isDragging) {
+                return;
+            }
             this.isDragging = false;
             if (this.currentId) {
                 this.homeId = this.currentId;
             }
+            this.setPosition(this.getHomePosition());
             this.events.trigger('dragend', {object: this, position: this.dragPosition.copy(), id: this.homeId});
         });
 
-        this.setAnimationUpdateFunction(() => {
-
-            if (this.isDragging && this.isDragEnabled) {
-                this.translate(this.targetPosition.copy().sub(this._position).mul(this.transitionSpeed));
-            } else {
-                if (this.homeId && this.isTransitionEnabled) {
-                    const targetPos = this.getSnapPosition(this.homeId);
-                    if (targetPos) {
-                        this.translate(targetPos.copy().sub(this._position).mul(this.transitionSpeed));
-                    }
-                }   
-            }
-            
-
-        });
     }
 
     // add a snap position with an id
@@ -444,6 +491,9 @@ class DraggableGameObject extends GameObject {
 
     setSnapPosition(id, x, y) {
         this.snapPositionMap[id]?.set(x, y);
+        if (this.getHomeId() === id) {
+            this.setPosition(this.getHomePosition());
+        }
         return this;
     }
 
@@ -485,9 +535,18 @@ class DraggableGameObject extends GameObject {
         return this;
     }
 
-    setHomeSnapPositionId(id) {
+    setHomeId(id) {
         this.homeId = id;
+        this.setPosition(this.getHomePosition());
         return this;
+    }
+
+    getHomeId() {
+        return this.homeId;
+    }
+
+    getHomePosition() {
+        return this.snapPositionMap[this.getHomeId()];
     }
 
     setXAxisLock(bool) {
@@ -500,19 +559,7 @@ class DraggableGameObject extends GameObject {
         return this;
     }
 
-    // set the animation / transition speed of the object
-    // this affects how it lerps toward the drag position or snap position
-    // 1 - moves instantly
-    // 0 - doesnt move 
-    setTransitionSpeed(speed) {
-        this.transitionSpeed = Math.max(0, Math.min(1, speed));
-        return this;
-    }
-
-    setTransitionEnabled(bool) {
-        this.isTransitionEnabled = bool;
-        return this;
-    }
+    
 
     setDragEnabled(bool) {
         this.isDragEnabled = bool;
@@ -527,9 +574,8 @@ class DraggableGameObject extends GameObject {
             return;
         }
 
-        const dist = this.dragPosition.distanceTo(targetPos);
-        const totalDist = targetPos.distanceTo(homePos);
-        return dist / totalDist;
+        const percent = Vector2.closestPointPercent(homePos, targetPos, this.dragPosition);
+        return percent;
     }
 }
 
