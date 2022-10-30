@@ -3,6 +3,7 @@
 class InventoryData {
 
     constructor(){
+        
         this.seasonbuff[1.5,1,0,.5];
         this.apples = new IngredientData('Apples','fall');
         this.pumpkins = new IngredientData('Pumkins','winter');
@@ -15,19 +16,16 @@ class InventoryData {
     }
      //updates every second incrementing the total amount of produce by the yield
     harvest(){
-        
-        
     this.seasonbuff = eventEmitter.on('seasonCycle', sBuffCalc());
     
     for(let  x = 0; y < 4; x++){
-        this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x]);
-
-        
+        this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x]);    
     }
     
 
        
     }
+    
 
     sBuffCalc(){
 
@@ -50,6 +48,9 @@ class InventoryData {
 
         }
     }
+
+    // increment and decrement items in the  stockcount array
+    
 
 }
 
