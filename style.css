@@ -77,4 +77,8 @@ main {
 
 .recipe-book-page {
     font-size: larger;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }

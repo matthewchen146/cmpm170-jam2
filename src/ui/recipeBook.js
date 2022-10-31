@@ -23,31 +23,8 @@ class RecipeBook extends GameObject {
             .setSize(this.getSize())
 
         this.pageContainer = new GameObject({container: this})
-
-        // create the pages as divs for each page
-        // there will be separate functions to setup the content of each page for organization
-        // alternatively, pages can be setup with HMTL and be queried & appended to these pages
-        this.recipePage = new GameObject({container: this.pageContainer})
-            .setClass('recipe-book-page', true)
-            .setSize(this.getSize())
-            .setText('Recipes')
-            .setVisible(false)
-
-        this.upgradePage = new GameObject({container: this.pageContainer})
-            .setClass('recipe-book-page', true)
-            .setSize(this.getSize())
-            .setText('Upgrades')
-            .setVisible(false)
-
-        this.awardPage = new GameObject({container: this.pageContainer})
-            .setClass('recipe-book-page', true)
-            .setSize(this.getSize())
-            .setText('Awards')
-            .setVisible(false)
-
+        
         this.isOpen = false;
-
-        this.pages.push(this.recipePage, this.upgradePage, this.awardPage);
 
         // create close book button, which hides the book if its open
         this.closeButton = new ButtonGameObject({container: this})
