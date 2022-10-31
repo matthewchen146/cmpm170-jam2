@@ -20,6 +20,10 @@ async function load() {
 let pot;
 let currencyLabel;
 let currency = 0;
+let inventory;
+let catChef;
+
+
 const eventEmitter = new EventEmitter();
 
 
@@ -33,6 +37,7 @@ eventEmitter.trigger('seasonCycle');
 // use this function to initialize anything
 function preUpdate() {
 
+
     const uiObjects = initializeUI();
 
     // creates an image object, which is an extension of gameobject
@@ -41,7 +46,9 @@ function preUpdate() {
         .setSize(200,200)
         .setPosition(gameContainer.centerX, 550)
         .setOrigin(.5, .5)
-    
+
+    inventory = new InventoryData;
+
     currencyLabel = new GameObject({element: document.querySelector('#currency')});
 
 
@@ -61,15 +68,17 @@ function update(delta, time) {
     pot.setPosition(gameContainer.centerX + Math.sin(time * .005) * 5)
         .setScale(Math.cos(time * .005))
         .rotate(.05)
-    
+       
     // add currency here
+    inventory.harvest();
     currency += delta / 1000;
 
     // set currency text in currency label
     currencyLabel.setProperty('textContent', `${currency.toFixed(2)} catnip`);
-
+ 
     //season
     getSeason();
+    
 }
 
 
