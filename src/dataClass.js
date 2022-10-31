@@ -58,7 +58,7 @@ class InventoryData {
    
     for(let  x = 0; x < 4; x++){
         this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x]);
-       // console.log('what the x doin',x);
+        console.log('what the x doin',this.stockCount[x]);
         //if one ingredient is missing, dont remove any items that are used in the recipie
         
     }  

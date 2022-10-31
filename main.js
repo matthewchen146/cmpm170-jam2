@@ -70,7 +70,9 @@ function update(delta, time) {
         .rotate(.05)
        
     // add currency here
+    if(time%1000<=50){
     inventory.harvest();
+    }
     currency += delta / 1000;
 
     // set currency text in currency label
