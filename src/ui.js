@@ -164,140 +164,25 @@ function initializeUI() {
         });
     })
 
+    const recipeBook = new RecipeBook({container: uiContainer});
 
-
-    // create recipe book content
-    const recipeBook = new GameObject({container: uiContainer})
-        .setVisible(false)
-        .setBackgroundColor('beige')
-        .setSize(450, 600)
-        .setOrigin(.5, .5)
-        .setPosition(gameContainer.centerX, gameContainer.centerY)
-    
-    const recipeBookBackground = new ImageGameObject({container: recipeBook, src: './assets/book-page.png'})
-        .setSize(recipeBook.getSize())
-
-    // create the pages as divs for each page
-    // there will be separate functions to setup the content of each page for organization
-    // alternatively, pages can be setup with HMTL and be queried & appended to these pages
-    const recipeBookRecipePage = new GameObject({container: recipeBook})
-        .setClass('recipe-book-page', true)
-        .setSize(recipeBook.getSize())
-        .setText('Recipes')
-        .setVisible(false)
-    
-    const recipeBookUpgradePage = new GameObject({container: recipeBook})
-        .setClass('recipe-book-page', true)
-        .setSize(recipeBook.getSize())
-        .setText('Upgrades')
-        .setVisible(false)
-
-    const recipeBookAwardPage = new GameObject({container: recipeBook})
-        .setClass('recipe-book-page', true)
-        .setSize(recipeBook.getSize())
-        .setText('Awards')
-        .setVisible(false)
-    
-    let recipeBookOpen = false;
-
-    const recipeBookPages = [recipeBookRecipePage, recipeBookUpgradePage, recipeBookAwardPage];
-    let currentPage = 0;
-
-
-
-    // create close book button, which hides the book if its open
-    const recipeBookCloseButton = new ButtonGameObject({container: recipeBook})
-        .setText('close')
-        .setPosition(450, 0)
-        .setOrigin(1,0)
-        .setBackgroundColor('pink')
-        .setClickCallback((e) => {
-            console.log('closing book');
-            recipeBookButton.setVisible(true);
-            recipeBook.setVisible(false);
-            recipeBookOpen = false;
-        })
-
-
-    // create page flipping buttons
-    // they are visible in the book
-    const recipeBookNextPage = new ButtonGameObject({container: recipeBook})
-        .setText('next')
-        .setPosition(recipeBook.getSize().x, 300)
-        .setSize(50,30)
-        .setOrigin(1,.5)
-        .setBackgroundColor('coral')
-        .setClickCallback((e) => {
-            if (currentPage >= recipeBookPages.length - 1) {
-                return;
-            }
-            recipeBookPrevPage.setVisible(true);
-            const previousPage = recipeBookPages[currentPage];
-            previousPage.setVisible(false);
-
-            currentPage += 1;
-            if (currentPage >= recipeBookPages.length - 1) {
-                recipeBookNextPage.setVisible(false);
-            }
-            // console.log('flipping to next page', currentPage);
-
-            const page = recipeBookPages[currentPage];
-            page.setVisible(true);
-        })
-
-    const recipeBookPrevPage = new ButtonGameObject({container: recipeBook})
-        .setText('prev')
-        .setPosition(0, 300)
-        .setSize(50,30)
-        .setOrigin(0,.5)
-        .setBackgroundColor('coral')
-        .setClickCallback((e) => {
-            if (currentPage === 0) {
-                return;
-            }
-            recipeBookNextPage.setVisible(true);
-            const previousPage = recipeBookPages[currentPage];
-            previousPage.setVisible(false);
-
-            currentPage -= 1;
-            if (currentPage === 0) {
-                recipeBookPrevPage.setVisible(false);
-            }
-            // console.log('flipping to prev page', currentPage);
-
-            const page = recipeBookPages[currentPage];
-            page.setVisible(true);
-        })
-        
-
-    // create recipe book open functionality, opens to a page
     recipeBookButton.setClickCallback((e) => {
-
-        console.log('opening book');
-
+        recipeBook.open();
         recipeBookButton.setVisible(false);
-        recipeBook.setVisible(true);
+    });
 
-        // overly complex next page/ previous page button setup
-        if (currentPage === 0) {
-            recipeBookPrevPage.setVisible(false);
-        } else if (currentPage >= recipeBookPages.length - 1) {
-            recipeBookNextPage.setVisible(false);
-        } else if (recipeBookPages.legnth !== 0) {
-            recipeBookPrevPage.setVisible(true);
-            recipeBookNextPage.setVisible(true);
-        }
-
-        // page setup
-        const page = recipeBookPages[currentPage];
-        page.setVisible(true);
-
-        recipeBookOpen = true;
+    recipeBook.on('close', () => {
+        recipeBookButton.setVisible(true);
     })
 
+    recipeBook.on('pageflip', (page) => {
+        // console.log('page flipped!', page);
+        
+        // maybe play a sound here, or put in the recipe book itself?
+    })
 
     uiObjects.recipeBook = recipeBook;
-    uiObjects.recipeBookPages = recipeBookPages;
+    // uiObjects.recipeBookPages = recipeBookPages;
 
     // return the ui data stored in uiObjects for use in other places.
     console.log('ui objects', uiObjects);
