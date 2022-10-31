@@ -47,15 +47,14 @@ class GameObject {
         
         // check if the element is in the document already
         if (this.element.isConnected) {
-            const parent = options.parent || options.container;
-            
-            if (parent) {
-                this.setParent(parent);
-            }
+            const parent = options.parent || options.container; // might remove
 
             // convert client rect into absolute positions
-            const rect = this.element.getBoundingClientRect();
-            this.setSize(rect.width, rect.height);
+            this.autoSize();
+
+            if (options.positionMode) {
+                this.setPositionMode(options.positionMode || GameObject.PositionModes.ABSOLUTE);
+            }
         } else {
             const parent = options.parent || options.container || GameObject.defaultContainer;
 
@@ -63,11 +62,14 @@ class GameObject {
                 this.setParent(parent);
             }
 
+            const positionMode = options.positionMode || GameObject.PositionModes.ABSOLUTE;
+
             this.setPosition(this._position.x, this._position.y);
             this.setSize(this._size.x, this._size.y);
+            
             this.setOrigin(this._origin.x, this._origin.y);
 
-            this.setPositionMode(options.positionMode || GameObject.PositionModes.ABSOLUTE);
+            this.setPositionMode(positionMode);
         }
 
         this.updateFunction;
@@ -125,6 +127,10 @@ class GameObject {
 
     // used internally. do not call for your own sake!
     setAbsolutePosition(x = this._currentPosition.x, y = this._currentPosition.y) {
+        if (this.positionMode === GameObject.PositionModes.NONE) {
+            return;
+        }
+
         let absoluteX;
         let absoluteY;
         if (x instanceof Object) {
@@ -144,16 +150,6 @@ class GameObject {
     // set the position of the element.
     setPosition(x = this._position.x, y = this._position.y) {
         this._position.set(x, y);
-        
-
-        // if (this.positionMode === GameObject.PositionModes.RELATIVE) {
-        //     if (!this.parent) {
-        //         this.parent = this.element.parent;
-        //     }
-        //     const parentRect = this.parent.getBoundingClientRect();
-        //     absoluteX += parentRect.left;
-        //     absoluteY += parentRect.top;
-        // }
 
         if (!this.isTransitionEnabled) {
             this._currentPosition.set(this._position);
@@ -163,8 +159,38 @@ class GameObject {
         return this;
     }
 
-    getPosition(absolute = false) {
-        return absolute ? this._position.copy() : this._currentPosition.copy();
+    getPosition(transition = false) {
+        if (this.positionMode === GameObject.PositionModes.ABSOLUTE) {
+            return transition ? this._position.copy() : this._currentPosition.copy();
+        } else {
+            // has not been tested thoroughly yet, be wary!
+            const parent = this.getParent();
+            let parentPos = new Vector2();
+            if (parent instanceof GameObject) {
+                parentPos.set(parent.getGlobalPosition());
+            } else {
+                const parentRect = parent.getBoundingClientRect();
+                parentPos.set(parentRect.left, parentRect.top);
+            }
+
+            const rect = this.element.getBoundingClientRect();
+            return new Vector2(
+                rect.left + this._size.x * this._origin.x,
+                rect.top + this._size.y * this._origin.y,
+            ).sub(parentPos);
+        }
+    }
+
+    getGlobalPosition() {
+        const rect = this.element.getBoundingClientRect();
+        return new Vector2(
+            rect.left + this._size.x * this._origin.x,
+            rect.top + this._size.y * this._origin.y,
+        );
+    }
+
+    getBoundingClientRect() {
+        return this.element.getBoundingClientRect();
     }
 
     // translates the object from the current position by x
@@ -234,6 +260,12 @@ class GameObject {
         this.setStyle('width', this._size.x);
         this.setStyle('height', this._size.y);
         this.setPosition(this._position.x, this._position.y);
+        return this;
+    }
+
+    autoSize() {
+        const rect = this.element.getBoundingClientRect();
+        this.setSize(rect.width, rect.height);
         return this;
     }
 
@@ -313,7 +345,7 @@ class GameObject {
                 break;
             case GameObject.PositionModes.NONE:
             default:
-                this.setStyle('position', undefined);
+                this.setStyle('position', 'static');
                 break;
         }
         this.setPosition(this._position.x, this._position.y);

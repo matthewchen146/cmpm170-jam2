@@ -166,6 +166,8 @@ function initializeUI() {
 
     const recipeBook = new RecipeBook({container: uiContainer});
 
+    fillRecipeBook(recipeBook);
+
     recipeBookButton.setClickCallback((e) => {
         recipeBook.open();
         recipeBookButton.setVisible(false);
