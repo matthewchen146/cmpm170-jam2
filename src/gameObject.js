@@ -40,29 +40,27 @@ class GameObject {
 
         this.positionMode = GameObject.PositionModes.ABSOLUTE;
 
-        this.parent;
+        // this.parent;
         this.element = options.element || (options.tag ? document.createElement(options.tag) : undefined) || document.createElement('div');
         this.element.isGameObject = true;
         this.element.gameObject = this;
         
         // check if the element is in the document already
         if (this.element.isConnected) {
-            this.parent = options.parent || options.container;
+            const parent = options.parent || options.container;
             
-            if (this.parent) {
-                this.setParent(this.parent);
-            } else {
-                this.parent = this.element.parentElement;
+            if (parent) {
+                this.setParent(parent);
             }
 
             // convert client rect into absolute positions
             const rect = this.element.getBoundingClientRect();
             this.setSize(rect.width, rect.height);
         } else {
-            this.parent = options.parent || options.container || GameObject.defaultContainer;
+            const parent = options.parent || options.container || GameObject.defaultContainer;
 
-            if (this.parent) {
-                this.setParent(this.parent);
+            if (parent) {
+                this.setParent(parent);
             }
 
             this.setPosition(this._position.x, this._position.y);
@@ -323,20 +321,34 @@ class GameObject {
         return this;
     }
 
-    getParent() {
-        return this.parent;
+    getParent(elementOnly = false) {
+        if (!this.element.parentElement) {
+            return;
+        }
+        if (elementOnly) {
+            return this.element.parentElement;
+        }
+        return this.element.parentElement.gameObject ? this.element.parentElement.gameObject : this.element.parentElement;
+    }
+
+
+    // a getter for getParent
+    get parent() {
+        return this.getParent();
+    }
+
+    // only returns the element, not the gameObject
+    get parentElement() {
+        return this.getParent(true);
     }
 
     setParent(parent) {
-        if (this.parent && this.element.parentElement === this.parent) {
-            this.parent.removeChild(this.element);
-        }
-        if (parent instanceof GameObject) {
-            this.parent = parent.element;
-        } else {
-            this.parent = parent;
-        }
-        this.parent.appendChild(this.element);
+        // remove from previous parent if there is one
+        this.getParent()?.removeChild(this.element);
+        
+        // append this to the new parent
+        parent.appendChild(this.element);
+
         this.setPosition(this._position.x, this._position.y);
         return this;
     }
@@ -351,8 +363,8 @@ class GameObject {
     }
 
     removeChild(child) {
-        if (child.parent !== this.element) {
-            console.log(`can't remove child if the element is not a child`, child);
+        if (child.parentElement !== this.element) {
+            console.error(`can't remove child if the element is not a child`, child);
             return this;
         }
         if (child instanceof GameObject) {
@@ -665,6 +677,10 @@ class ButtonGameObject extends GameObject {
     setClickCallback(callback) {
         this.clickCallback = callback;
         return this;
+    }
+
+    onClick(callback) {
+        return this.setClickCallback(callback);
     }
 }
 
