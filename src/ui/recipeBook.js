@@ -110,6 +110,9 @@ class RecipeBook extends GameObject {
 
     // flip to the specified page
     flipToPage(index) {
+        // clamp index
+        index = Math.min(this.pages.length - 1, index);
+
         const lastIndex = this.pageIndex;
         if (index >= this.pages.length - 1) {
             // last page
@@ -118,6 +121,9 @@ class RecipeBook extends GameObject {
             if (this.pages.length > 1) {
                 this.nextPageButton.setVisible(false);
                 this.prevPageButton.setVisible(true);
+            } else {
+                this.nextPageButton.setVisible(false);
+                this.prevPageButton.setVisible(false);
             }
 
         } else if (index <= 0) {
@@ -127,17 +133,15 @@ class RecipeBook extends GameObject {
             if (this.pages.length > 1) {
                 this.nextPageButton.setVisible(true);
                 this.prevPageButton.setVisible(false);
+            } else {
+                this.nextPageButton.setVisible(false);
+                this.prevPageButton.setVisible(false);
             }
 
         } else {
             // middle page
-            if (this.pages.length <= 1) {
-                this.nextPageButton.setVisible(false);
-                this.prevPageButton.setVisible(false);
-            } else {
-                this.nextPageButton.setVisible(true);
-                this.prevPageButton.setVisible(true);
-            }
+            this.nextPageButton.setVisible(true);
+            this.prevPageButton.setVisible(true);
         }
 
         this.pageIndex = index;
