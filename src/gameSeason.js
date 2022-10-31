@@ -36,7 +36,7 @@ function getSeason(){
     if(month > 9 && month <= 12){
         return 'fall';
     }
-    if(month > 12 && month <= 3){
+    if(month == 1 && month <= 3){
         return 'winter';
     }
 }
