@@ -106,6 +106,27 @@ class Vector2 {
         }
     }
 
+    // linear interpolate to the specified vector v
+    lerpv(v, t) {
+        return this.copy().add(new Vector2(v).sub(this).mul(t));
+    }
+
+    // linear interpolate to the specified vector(x, y)
+    // internally calls lerpv
+    // t is the amount to interpolate between 0 and 1
+    lerp(x, y, t) {
+        if (x instanceof Object) {
+            return this.lerpv(new Vector2(x), y)
+        } else {
+            return this.lerpv(new Vector2(x, y), t)
+        }
+    }
+
+    // lerp between 2 vectors
+    static lerp(v1, v2, t) {
+        return new Vector2(v1).lerp(v2.x, v2.y, t);
+    }
+
     // get the percent of the closest point between start and end from point
     static closestPointPercent(start, end, point) {
         const startToEnd = end.copy().sub(start);

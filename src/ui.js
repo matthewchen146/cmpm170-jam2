@@ -231,10 +231,14 @@ function initializeUI() {
             if (currentPage >= recipeBookPages.length - 1) {
                 return;
             }
+            recipeBookPrevPage.setVisible(true);
             const previousPage = recipeBookPages[currentPage];
             previousPage.setVisible(false);
 
             currentPage += 1;
+            if (currentPage >= recipeBookPages.length - 1) {
+                recipeBookNextPage.setVisible(false);
+            }
             // console.log('flipping to next page', currentPage);
 
             const page = recipeBookPages[currentPage];
@@ -251,10 +255,14 @@ function initializeUI() {
             if (currentPage === 0) {
                 return;
             }
+            recipeBookNextPage.setVisible(true);
             const previousPage = recipeBookPages[currentPage];
             previousPage.setVisible(false);
 
             currentPage -= 1;
+            if (currentPage === 0) {
+                recipeBookPrevPage.setVisible(false);
+            }
             // console.log('flipping to prev page', currentPage);
 
             const page = recipeBookPages[currentPage];
@@ -264,9 +272,21 @@ function initializeUI() {
 
     // create recipe book open functionality, opens to a page
     recipeBookButton.setClickCallback((e) => {
+
         console.log('opening book');
+
         recipeBookButton.setVisible(false);
         recipeBook.setVisible(true);
+
+        // overly complex next page/ previous page button setup
+        if (currentPage === 0) {
+            recipeBookPrevPage.setVisible(false);
+        } else if (currentPage >= recipeBookPages.length - 1) {
+            recipeBookNextPage.setVisible(false);
+        } else if (recipeBookPages.legnth !== 0) {
+            recipeBookPrevPage.setVisible(true);
+            recipeBookNextPage.setVisible(true);
+        }
 
         // page setup
         const page = recipeBookPages[currentPage];
