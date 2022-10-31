@@ -27,16 +27,16 @@ function addMonth(){
 
 function getSeason(){
     let month = gameCalender.month 
-    if(month > 3 && month < 6){
+    if(month > 3 && month <= 6){
         return 'spring';
     }
-    if(month > 6 && month < 9){
+    if(month > 6 && month <= 9){
         return 'summer';
     }
-    if(month > 9 && month < 12){
+    if(month > 9 && month <= 12){
         return 'fall';
     }
-    if(month > 12 && month < 3){
+    if(month > 12 && month <= 3){
         return 'winter';
     }
 }
