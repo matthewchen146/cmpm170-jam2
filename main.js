@@ -46,8 +46,16 @@ function preUpdate() {
         .setSize(200,200)
         .setPosition(gameContainer.centerX, 550)
         .setOrigin(.5, .5)
-
+    applejuice = new RecipeData('applejuice',1,'Apples',1);
+  
     inventory = new InventoryData;
+    catChef = new ChefData(applejuice);
+    catChef.setRecipe(applejuice,inventory);
+
+
+
+    catshier = new CatnipCollector;
+
 
     currencyLabel = new GameObject({element: document.querySelector('#currency')});
 
@@ -69,11 +77,14 @@ function update(delta, time) {
         .setScale(Math.cos(time * .005))
         .rotate(.05)
        
-    // add currency here
-    if(time%1000<=50){
+    // anything involving something per second, place in here for now
+    if(time%1000<10){
     inventory.harvest();
+    
+    currency += catChef.cookStuff(inventory,catshier);
+
     }
-    currency += delta / 1000;
+    
 
     // set currency text in currency label
     currencyLabel.setProperty('textContent', `${currency.toFixed(2)} catnip`);

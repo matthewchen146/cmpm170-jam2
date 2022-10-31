@@ -28,7 +28,7 @@ class InventoryData {
         this.outgoing = [0,0,0,0];
         
     }
-    sBuffCalc(){
+    sBuffCalc(seasonbuff){
 
         
      
@@ -36,15 +36,15 @@ class InventoryData {
           
  
              case 'spring':
-                 return this.seasonbuff=[1.5,1,0,.5];
+                 return seasonbuff=[1.5,1,0,.5];
                  
              case 'summer':
-                 return this.seasonbuff=[1,1.5,1,0];
+                 return seasonbuff=[.5,1.5,1,0];
              
              case 'winter': 
-                 return this.seasonbuff=[0,.5,1.5,1];
+                 return seasonbuff=[0,.5,1.5,1];
              case 'fall':
-                 return this.seasonbuff=[1.5,1,.5,0];
+                 return seasonbuff=[1.5,1,.5,0];
              default:
                  console.log('uhoh');
                  break;
@@ -53,12 +53,44 @@ class InventoryData {
      }
      //updates every second incrementing the total amount of produce by the yield
     harvest(){
+        eventEmitter.on('seasonCycle',()=>{switch(getSeason()){
+          
+ 
+            case 'spring':
+                console.log('spring = no apple');
+                let buff=[1.5,1,0,.5];
+                this.seasonbuff.splice(0, this.seasonbuff.length, ...buff);
+                break;
+            case 'summer':
+                console.log('summer = no pumpkin');
+                 let buff1=[.5,1.5,1,0];
+                 
+                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff1);
+                 break;
+            case 'winter': 
+            console.log('winter = no berry');
+                 let buff2=[0,.5,1.5,1];
+     
+                this.seasonbuff.splice(0, this.seasonbuff.length, ...buff2);
+                break;
+            case 'fall':
+                console.log('fall= no corn');
+               let buff3=[.5,0,1,1.5];
+                
+                this.seasonbuff.splice(0, this.seasonbuff.length, ...buff3);
+                break;
+            default:
+                console.log('uhoh');
+                break;
+
+        }
+    });
 
      
    
     for(let  x = 0; x < 4; x++){
         this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x]);
-        console.log('what the x doin',this.stockCount[x]);
+        
         //if one ingredient is missing, dont remove any items that are used in the recipie
         
     }  
@@ -70,14 +102,16 @@ class InventoryData {
     orderedIng(){
         
         for (let x = 0 ; x <4;x++) {
-            if (this.stockCount[x]<this.outgoing){
+            if (this.stockCount[x]<this.outgoing[x]){
                 return false;
             }
             
         }
 
         for(let y = 0;y<4;y++){
+            
             this.stockCount[y]-=this.outgoing[y];
+           
         }
         
         return true;
@@ -153,15 +187,32 @@ class IngredientData {
 //holds ingredients needed
 //holds amount of ingredients needed
 //holds base selling price
+//PLEASE INITIALIZE RECIPIES WITH THE INGREDIENTS, FOLLOWED BY
+//THE NEEDED AMOUNTS 
+// example
+// Apples,pumpkins, 1 ,2;
 class RecipeData{
-    constructor(ingredient){
-        this.reqIngred=['airsoup'];
-        this.reqamount=[0];
+    constructor(name,value,...recipelist ){
+        this.name = name;
+        this.reqIngred=[];
+        this.reqamount=[];
+        for(let x in recipelist){
+            
+            
+            if(isNaN(recipelist[x])){
+                this.reqIngred.push(recipelist[x]);
+               
+            
+        }
+        else{
+            this.reqamount.push(recipelist[x]);
+        }
+    }
         this.isKnown= false;
-        this.value = 1;
+        this.value = value;
     }
 
-    
+  
 }
 
 
@@ -171,8 +222,9 @@ class RecipeData{
 //takes in recipe and requests ingredients
 //
 class ChefData {
-construcor(){
-    this.currentRecipe ;
+construcor(recipeinit){
+    
+    this.currentRecipe = recipeinit ;
     this.productionMult = 1;
     
 }
@@ -181,9 +233,14 @@ construcor(){
     //ALWAYS SET RECIPE BEFORE UPDATING
     setRecipe(RecipeDat,inven){
         this.currentRecipe = RecipeDat;
-        let Recipelen = this.currentRecipe.reqIngred.length();
+        let Recipelen = this.currentRecipe.reqIngred.length;
+       
+        if(RecipeDat.reqIngred[0]==='airsoup'){
+            
+        }
         for (let x = 0; x <Recipelen;x++ ){
             inven.requestSet(this.currentRecipe.reqIngred[x],this.currentRecipe.reqamount[x]);
+            console.log("amount"+this.currentRecipe.reqIngred[x])
 
         }
     }
@@ -191,10 +248,16 @@ construcor(){
     cookStuff(inven,cashier){
         //if there is enough ingredients, make food and tell cashier
         //to make sale
+      
        if( inven.orderedIng()){
+        
 
-            cashier.makeSale(this.currentRecipe.value);
+           return cashier.makeSale(this.currentRecipe.value);
        }
+       else {
+        return 0;
+       }
+       
     }
     
    
@@ -219,6 +282,7 @@ class CatnipCollector{
 
     makeSale(value){
 
+        return value;
 
     }
 
