@@ -114,9 +114,11 @@ class GameObject {
     setVisible(bool) {
         this.isVisible = bool;
         if (this.isVisible) {
-            this.setStyle('display', '');
+            // this.setStyle('display', '');
+            this.setStyle('visibility', 'inherit');
         } else {
-            this.setStyle('display', 'none');
+            // this.setStyle('display', 'none');
+            this.setStyle('visibility', 'hidden');
         }
         return this;
     }
@@ -181,12 +183,31 @@ class GameObject {
         }
     }
 
+    // set the global opsition of the object
+    // not thoroughly tested yet
+    setGlobalPosition(x, y) {
+        const globalPos = new Vector2(x, y).sub(Game.left, Game.top);
+        const diff = globalPos.sub(this.getGlobalPosition());
+        this.translate(diff);
+        return this;
+    }
+
+    setGamePosition() {
+        return this.setGlobalPosition();
+    }
+
+    // returns position relative to the game container
+    // note this only works because the game container is transformed from the corner
     getGlobalPosition() {
         const rect = this.element.getBoundingClientRect();
         return new Vector2(
-            rect.left + this._size.x * this._origin.x,
-            rect.top + this._size.y * this._origin.y,
+            rect.left + this._size.x * this._origin.x - Game.left,
+            rect.top + this._size.y * this._origin.y - Game.top,
         );
+    }
+
+    getGamePosition() {
+        return this.getGlobalPosition();
     }
 
     getBoundingClientRect() {
