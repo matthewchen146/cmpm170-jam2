@@ -90,3 +90,75 @@ main {
     justify-content: center;
     align-items: center;
 }
+
+
+/* recipe container */
+
+.recipes {
+    height: 450px;
+    overflow-y: scroll;
+}
+
+.recipe-container {
+    display: grid;
+    grid-template-columns: 8fr 2fr;
+    column-gap: 5px;
+    background-color: cornsilk;
+    margin-bottom: 6px;
+}
+
+.recipe-container .info-container {
+    
+}
+
+.recipe-container .label-container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.recipe-container .label-container .label {
+    font-size: 20px;
+}
+
+.recipe-container .label-container img {
+    width: 90px;
+    height: 90px;
+}
+
+.recipe-container .ingredients-container {
+    display: flex;
+    justify-content: start;
+}
+
+.recipe-container .ingredient-container {
+    position: relative;
+}
+
+.recipe-container .ingredient-container img {
+    width: 30px;
+    height: 30px;
+}
+
+.recipe-container .ingredient-container .ingredient-amt {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    right: -5px;
+    bottom: -5px;
+    background-color: coral;
+    border-radius: 10px;
+    color: white;
+}
+
+.recipe-container .button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.recipe-container .button-container .select-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

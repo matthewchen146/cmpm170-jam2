@@ -14,13 +14,146 @@ function initializeRecipePage(recipeBook) {
     const page = recipeBook.createPage()
         .setId('recipes')
     
+    const title = createTitle('Recipes');
+
+    page.appendChild(title);
+    
     const centerContainer = document.createElement('div');
     centerContainer.style.textAlign = 'center';
+    centerContainer.classList.toggle('recipes', true);
     page.appendChild(centerContainer);
 
-    const title = createTitle('Recipes');
+    // create a grid
+    // const grid = document.createElement('div');
+    // centerContainer.appendChild(grid);
+    // grid.style.display = 'grid';
+    // grid.style.gridTemplateColumns = '1fr 1fr 1fr';
+    // grid.style.rowGap = '5px';
+
+    const addRecipe = ({name, id, ingredients, img}) => {
+        const recipeContainer = document.createElement('div');
+        recipeContainer.classList.toggle('recipe-container', true);
+        // recipeContainer.style.display = 'grid';
+        // recipeContainer.style.gridTemplateColumns = '8fr 2fr';
+        // recipeContainer.style.columnGap = '5px';
+
+        const infoContainer = document.createElement('div');
+        infoContainer.classList.toggle('info-container', true);
+        recipeContainer.appendChild(infoContainer);
+        // infoContainer.style.display = 'flex';
+        // infoContainer.style.width
+
+        const labelContainer = document.createElement('div');
+        labelContainer.classList.toggle('label-container', true);
+        infoContainer.appendChild(labelContainer);
+
+        const recipeImg = document.createElement('img');
+        recipeImg.setAttribute('src', img);
+        labelContainer.appendChild(recipeImg);
+
+        const label = document.createElement('div');
+        label.classList.toggle('label', true);
+        label.textContent = name;
+        labelContainer.appendChild(label);
+
+        const ingredientsContainer = document.createElement('div');
+        ingredientsContainer.classList.toggle('ingredients-container', true);
+        infoContainer.appendChild(ingredientsContainer);
+
+        // add the ingredients required to the ingredients container, with the amt needed
+        Object.entries(ingredients).forEach(([ingredient, amt]) => {
+
+            const ingredientContainer = document.createElement('div');
+            ingredientContainer.classList.toggle('ingredient-container', true);
+            
+            const ingredientImg = document.createElement('img');
+            ingredientImg.setAttribute('src', ingredientMap[ingredient]?.img || './assets/apple.png');
+            ingredientImg.classList.toggle('ingredient-img', true);
+            ingredientContainer.appendChild(ingredientImg);
+
+            const text = document.createElement('div');
+            text.classList.toggle('ingredient-amt', true);
+            text.textContent = `${amt}`;
+            ingredientContainer.appendChild(text);
+            
+            ingredientsContainer.appendChild(ingredientContainer);
+            
+        });
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.toggle('button-container', true);
+        recipeContainer.appendChild(buttonContainer);
+
+        // const buttonText = document.createElement('div');
+        // buttonText.textContent = 'Cook';
+
+        const selectButton = new ButtonGameObject({
+            container: buttonContainer,
+            positionMode: GameObject.PositionModes.NONE
+        })
+            .setClass('select-button', true)
+            .setSize(50,50)
+            .setText('Cook')
+            // .appendChild(buttonText)
+
+        centerContainer.appendChild(recipeContainer);
+
+
+        const recipeData = {
+            selectButton
+        };
+
+        return recipeData;
+    }
+
+    const selectedRecipes = [];
+    const availableRecipes = {};
+
+    Object.entries(recipeList).forEach(([id, recipe]) => {
+        if (recipe.default) {
+            const recipeData = addRecipe({
+                id: id,
+                name: recipe.name || recipe.id,
+                img: recipe.img,
+                ingredients: recipe.ingredients
+            });
+            availableRecipes[id] = recipeData;
+        }
+    })
     
-    page.appendChild(title);
+    // ingredients is an object {
+    //     ingredientName: quantity,
+    //     ...   
+    // }
+    const findRecipeId = (_ingredients) => {
+        
+        let foundRecipe;
+        for (const [id, recipe] of Object.entries(recipeList)) {
+            const ingredients = Object.assign({}, _ingredients);
+            for (const [ingredient, amt] of Object.entries(recipe.ingredients)) {
+                if (ingredients[ingredient]) {
+                    ingredients[ingredient] -= amt;
+                }
+            }
+            
+            for (const amt of Object.values(ingredients)) {
+                if (amt !== 0) {
+                    return;
+                }
+            }
+            foundRecipe = id;
+        }
+        return foundRecipe;
+    }
+
+    const recipePageData = {
+        addRecipe,
+        findRecipeId,
+        availableRecipes,
+        selectedRecipes
+    };
+
+    return recipePageData;
 }
 
 
@@ -30,13 +163,13 @@ function initializeUpgradePage(recipeBook) {
     const page = recipeBook.createPage()
         .setId('upgrades')
 
+    const title = createTitle('Upgrades');
+
+    page.appendChild(title);
+
     const centerContainer = document.createElement('div');
     centerContainer.style.textAlign = 'center';
     page.appendChild(centerContainer);
-
-    const title = createTitle('Upgrades');
-    
-    page.appendChild(title);
 
     // create a grid
     const grid = document.createElement('div');
@@ -59,7 +192,7 @@ function initializeUpgradePage(recipeBook) {
     grid.appendChild(levelTitle);
     grid.appendChild(buttonTitle);
 
-    const upgradeData = {};
+    const upgradePageData = {};
 
     // the grid:
     // ITEMS (their icon only) - LEVEL - UPGRADE BUTTON (with cost)
@@ -114,23 +247,23 @@ function initializeUpgradePage(recipeBook) {
             .setSize(80, 50)
             .setText(`${cost || 0} catnip`)
         
-        upgradeData[id] = {button, levelText: text, img};
+            upgradePageData[id] = {button, levelText: text, img};
     });
 
-    return upgradeData;
+    return upgradePageData;
 }
 
 // move upgrade buttons into ui objects
 // possible make ui objects global
 function fillRecipeBook(recipeBook, uiObjects) {
     
-    const recipeData = initializeRecipePage(recipeBook);
-    uiObjects.recipeData = recipeData;
+    const recipePageData = initializeRecipePage(recipeBook);
+    uiObjects.recipePageData = recipePageData;
 
     // create the upgrades page
     // returns upgrade data for each item, including the button, level label, and icon
-    const upgradeData = initializeUpgradePage(recipeBook);
-    uiObjects.upgradeData = upgradeData;
+    const upgradePageData = initializeUpgradePage(recipeBook);
+    uiObjects.upgradePageData = upgradePageData;
 
     recipeBook.createPage()
         .setText('awards')
