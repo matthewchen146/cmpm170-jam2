@@ -222,7 +222,7 @@ function update(delta, time) {
     // anything involving something per second, place in here for now
   
     
-    currency += catChef.cookStuff(catshier,potion,inventory)*(delta/1000);
+    currency = catChef.cookStuff(catshier,potion,inventory)*(delta/1000);
 
     // set currency text in currency label
     currencyLabel.setText(`${currency.toFixed(2)} catnip`);
