@@ -84,17 +84,13 @@ function initializeRecipePage(recipeBook) {
         buttonContainer.classList.toggle('button-container', true);
         recipeContainer.appendChild(buttonContainer);
 
-        // const buttonText = document.createElement('div');
-        // buttonText.textContent = 'Cook';
-
         const selectButton = new ButtonGameObject({
             container: buttonContainer,
             positionMode: GameObject.PositionModes.NONE
         })
             .setClass('select-button', true)
-            .setSize(50,50)
+            .setSize(70,50)
             .setText('Cook')
-            // .appendChild(buttonText)
 
         centerContainer.appendChild(recipeContainer);
 
@@ -105,21 +101,6 @@ function initializeRecipePage(recipeBook) {
 
         return recipeData;
     }
-
-    const selectedRecipes = [];
-    const availableRecipes = {};
-
-    Object.entries(recipeList).forEach(([id, recipe]) => {
-        if (recipe.default) {
-            const recipeData = addRecipe({
-                id: id,
-                name: recipe.name || recipe.id,
-                img: recipe.img,
-                ingredients: recipe.ingredients
-            });
-            availableRecipes[id] = recipeData;
-        }
-    })
     
     // ingredients is an object {
     //     ingredientName: quantity,
@@ -148,9 +129,7 @@ function initializeRecipePage(recipeBook) {
 
     const recipePageData = {
         addRecipe,
-        findRecipeId,
-        availableRecipes,
-        selectedRecipes
+        findRecipeId
     };
 
     return recipePageData;
