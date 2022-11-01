@@ -4,6 +4,8 @@
 //the scope develops
 
 
+//BIG REWORK SOON, INGREDIENTS ARE PASSED INTO
+//INVENTORY DYNAMICALLY
 
 
 
@@ -14,48 +16,26 @@
 //Recipe
 class InventoryData {
 
-    constructor(){
-        
+    constructor(...ingredients){
+        this.curSeason = 'spring';
         this.seasonbuff =[1.5,1,0,.5];
-        this.apples = new IngredientData('Apples','fall');
-        this.pumpkins = new IngredientData('Pumkins','winter');
-        this.berry =  new IngredientData('Berry','spring');
-        this.corn = new IngredientData('Corn','summer');
+        this.inStock = [];
         
-
-        this.inStock = [(this.berry),(this.corn),(this.pumpkins),(this.apples)];
-        this.stockCount = [0,0,0,0];
-        this.outgoing = [0,0,0,0];
+        for (let ing in ingredients){
+            
+            this.inStock.push(ing);
+        }
+       
+        this.stockCount = new Array(ingredients.length);
+        this.stockCount.fill(0);
+        this.outgoing =  new Array(ingredients.length);
+        this.outgoing.fill(0);
         
     }
-    sBuffCalc(seasonbuff){
-
-        
-     
-         switch(getSeason()){
-          
- 
-             case 'spring':
-                 return seasonbuff=[1.5,1,0,.5];
-                 
-             case 'summer':
-                 return seasonbuff=[.5,1.5,1,0];
-             
-             case 'winter': 
-                 return seasonbuff=[0,.5,1.5,1];
-             case 'fall':
-                 return seasonbuff=[1.5,1,.5,0];
-             default:
-                 console.log('uhoh');
-                 break;
- 
-         }
-     }
+   
      //updates every second incrementing the total amount of produce by the yield
     harvest(){
-        eventEmitter.on('seasonCycle',()=>{switch(getSeason()){
-          
- 
+        eventEmitter.on('seasonCycle',()=>{switch(getSeason()){   
             case 'spring':
                 console.log('spring = no apple');
                 let buff=[1.5,1,0,.5];
@@ -75,7 +55,7 @@ class InventoryData {
                 break;
             case 'fall':
                 console.log('fall= no corn');
-               let buff3=[.5,0,1,1.5];
+               let buff3=[1,0,.5,1.5];
                 
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff3);
                 break;
@@ -88,11 +68,8 @@ class InventoryData {
 
      
    
-    for(let  x = 0; x < 4; x++){
-        this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x]);
-        
-        //if one ingredient is missing, dont remove any items that are used in the recipie
-        
+    for(let  x = 0; x < this.stockCount.length; x++){
+        this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x.getPrimeSeason()]);  
     }  
     }
     
@@ -100,16 +77,15 @@ class InventoryData {
        //chef asks for ingredients and if all are in 
        //stock subtract that much and let them cook
     orderedIng(){
-        
-        for (let x = 0 ; x <4;x++) {
+        for (let x = 0 ; x <this.stockCount.length;x++) {
             if (this.stockCount[x]<this.outgoing[x]){
+                console.log(this.stockCount[x],"sus",this.outgoing[x]);
                 return false;
-            }
-            
+            } 
         }
 
-        for(let y = 0;y<4;y++){
-            
+        for(let y = 0;y<this.stockCount.length;y++){
+            console.log(this.stockCount[y],"sussy",this.outgoing[y]);
             this.stockCount[y]-=this.outgoing[y];
            
         }
@@ -118,66 +94,72 @@ class InventoryData {
 
     }
 
+
+    //find the ingredient name and call its upgrade function
+    upgradeIng(name){
+
+
+    }
+    
+
     //Chef request ingredient amount per second 
     //every time recipe changes or scales
     //outgoing amounts allow for 
-   
-   
-
     requestSet(ingredient,amount){
-        switch(ingredient){
-            case 'Berry':
-                this.outgoing[0]=amount;
-                return ;
-                
-            case 'Corn':
-                this.outgoing[1]=amount;
-                return ;
-            case 'Apples': 
-            this.outgoing[2]=amount;
-                return ;
-            case 'Pumpkins':
-                this.outgoing[3]=amount;
-                return ;
-            default:
-                console.log('uhoh2');
-                return
-
+       let res = this.inStock.findIndex(element=>ingredient === element.getName())
+        if (res===-1){
+             console.log("ingredient not in stock!");
         }
-        
+        else{
+            this.outgoing[res]=amount;
+        }
     }
-
-
-   
-
-    
-    
-
 }
 
+//Ingredients are given to inventory dynamically
+//Season buff is given by inventory based on 
 class IngredientData {
     constructor(name,season){
         
         this.name = name;
-        this.season =season;
+        switch(season){
+            case 'spring':
+                this.season = 0;
+                break;
+            case 'summer' :
+                this.season = 1;
+                break;
+            case 'fall':
+                this.season = 2;
+                break;
+            case'winter':
+                this.season =3;
+                break;
+            default: 
+                console.log("ingredient season broke");
+                this.season = 0;
+                break;
+        }
+         
         this.level = 0;
         this.yield = 1;
-        
     }
 
     getName(){
         return this.name;
     }
-    
+    getPrimeSeason(){
+        return this.season;
+    }
     crop(passedbuff){
         return this.yield*passedbuff;
     }
-
     levelUp(){
-
+        this.level +=1;
     }
 
     yieldUp(){
+        this.yield +=1;
 
     }
 
@@ -216,6 +198,20 @@ class RecipeData{
 }
 
 
+//Potion class will hold how much 
+//potion is available
+//potion will determine how many calls are 
+//send by chef for ingredients, as all
+//recipies rely on potions.
+//no need to have anything other than chef 
+//knowing about it.
+class PotionData{
+    constructor(){
+        this.potionlevel = 1;
+        
+    }
+
+}
 
 
 
@@ -225,6 +221,7 @@ class ChefData {
 construcor(recipeinit){
     
     this.currentRecipe = recipeinit ;
+    //the cat level, how many of a dish is made at a time.
     this.productionMult = 1;
     
 }
@@ -235,12 +232,10 @@ construcor(recipeinit){
         this.currentRecipe = RecipeDat;
         let Recipelen = this.currentRecipe.reqIngred.length;
        
-        if(RecipeDat.reqIngred[0]==='airsoup'){
-            
-        }
+       
         for (let x = 0; x <Recipelen;x++ ){
-            inven.requestSet(this.currentRecipe.reqIngred[x],this.currentRecipe.reqamount[x]);
-            console.log("amount"+this.currentRecipe.reqIngred[x])
+            inven.requestSet(this.currentRecipe.reqIngred[x],this.currentRecipe.reqamount[x]*this.productionMult);
+           // console.log("amount"+this.currentRecipe.reqIngred[x])
 
         }
     }
@@ -252,7 +247,7 @@ construcor(recipeinit){
        if( inven.orderedIng()){
         
 
-           return cashier.makeSale(this.currentRecipe.value);
+           return cashier.makeSale(this.currentRecipe.value*this.productionMult);
        }
        else {
         return 0;
@@ -263,11 +258,7 @@ construcor(recipeinit){
    
 
     
-    //Used by Catnip Collector to get the current 
-    //returns 0 if nothing was made
-    orderUp(){
-
-    }
+    
 
     
 
@@ -275,8 +266,14 @@ construcor(recipeinit){
 }
 //Asks if something has been cooked and calculates the total
 //catnip gained and in the bank
+//Tracks  levels
 class CatnipCollector{
     constructor(){
+        
+        this.levels= {potionlevel:1,applelevel:1,pumpkinlevel:1,
+            cornlevel:1,berrylevel:1};
+        
+
 
     }
 
@@ -286,14 +283,36 @@ class CatnipCollector{
 
     }
 
+    //returns false if you cant afford x
+    purchase(amount){
+
+    }
+
 
 
 
 
 }
+
+//THE TOP DOG
 //contains list of all the recipies and 
 //a list of all recipies the player knows
+//contains current recipe selected and 
+//sends relevant data to all classes who need it.
+//
 class Grimoire{
+    constructor(){
+         
+        
+
+    }
+    //runs all of the variables that consume ingredients
+    storesopen(chef,cashier,inventory){
+        //
+    }
+    storeclosed(){
+
+    }
 
 }
 

@@ -47,7 +47,9 @@ function preUpdate() {
         .setPosition(gameContainer.centerX, 550)
         .setOrigin(.5, .5)
     applejuice = new RecipeData('applejuice',1,'Apples',1);
-  
+
+    Berry 
+    
     inventory = new InventoryData;
     catChef = new ChefData(applejuice);
     catChef.setRecipe(applejuice,inventory);
