@@ -7,7 +7,12 @@
 //BIG REWORK SOON, INGREDIENTS ARE PASSED INTO
 //INVENTORY DYNAMICALLY
 
-
+const seasonsEnum = {
+    spring: 0,
+    summer: 1,
+    fall: 2,
+    winter: 3
+}
 
 
 //The middleman between the chef and ingredients
@@ -34,24 +39,24 @@ class InventoryData {
     updateProduction(){
         eventEmitter.on('seasonCycle',()=>{switch(getSeason()){   
             case 'spring':
-                console.log('spring = no apple');
+                // console.log('spring = no apple');
                 let buff=[2,1.5,.5,1];
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff);
                 break;
             case 'summer':
-                console.log('summer = no pumpkin');
+                // console.log('summer = no pumpkin');
                  let buff1=[.5,2,1.5,1];
                  
                  this.seasonbuff.splice(0, this.seasonbuff.length, ...buff1);
                  break;
             case 'winter': 
-            console.log('winter = no berry');
+            // console.log('winter = no berry');
                  let buff2=[1,.5,2,1.5];
      
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff2);
                 break;
             case 'fall':
-                console.log('fall= no corn');
+                // console.log('fall= no corn');
                let buff3=[1,2,.5,1.5];
                 
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff3);
@@ -68,7 +73,7 @@ class InventoryData {
     for(let  x = 0; x < this.outgoing.length; x++){
       //  console.log("achimone ahh "+this.inStock[x]);
         this.harvest[x] = (this.inStock[x]).crop(this.seasonbuff[this.inStock[x].season])
-        console.log(this.harvest[x]);
+        // console.log(this.harvest[x]);
     }  
     }
     
@@ -120,27 +125,15 @@ class InventoryData {
 //Ingredients are given to inventory dynamically
 //Season buff is given by inventory based on 
 class IngredientData {
-    constructor(name,season){
+    constructor(id, options = {}){
         
-        this.name = name;
-        switch(season){
-            case 'spring':
-                this.season = 0;
-                break;
-            case 'summer' :
-                this.season = 1;
-                break;
-            case 'fall':
-                this.season = 2;
-                break;
-            case'winter':
-                this.season =3;
-                break;
-            default: 
-                console.log("ingredient season broke");
-                this.season = 0;
-                break;
-        }
+        this.id = id;
+        this.name = options.name || id;
+        this.img = options.img || '';
+        
+        // gets the season number from the seasonsEnum based on the season name
+        // if it's not a valid season name, it defaults to 0 (spring)
+        this.season = seasonsEnum[options.season] || 0;
          
         
         this.yield = 1;
@@ -171,26 +164,26 @@ class IngredientData {
 //PLEASE INITIALIZE RECIPIES WITH THE INGREDIENTS, 
 // example
 // Apples,pumpkins,
-class RecipeData{
-    constructor(name,value,...recipelist ){
-        this.name = name;
-        this.reqIngred=[];
-        this.reqamount=11;
-        for(let x in recipelist){
-            
-            
-            if(isNaN(recipelist[x])){
-                this.reqIngred.push(recipelist[x]);
-               
-            
-        }
-       
-    }
-        this.isKnown= false;
-        this.value = value;
+class RecipeData {
+    constructor(id, ingredients, options = {}) {
+
+        this.id = id;
+        this.name = options.name || id;
+        this.img = options.img || ''; //'./assets/recipes/default.png';
+        this.ingredients = ingredients;
+        this.value = options.value || 1;
+
+        // reference to the select button on the recipe page of the book
+        this.selectButton;
+
+        this.reqamount = 11;
+
+        this.isKnown = false;
     }
 
-  
+    getIngredientIds() {
+        return Object.keys(this.ingredients);
+    }
 }
 
 
@@ -241,16 +234,17 @@ constructor(recipeinit){
     //set current recipe and tell the inventoryData what is 
     //needed
     //ALWAYS SET RECIPE BEFORE UPDATING
-    setRecipe(RecipeDat,inven){
-        this.currentRecipe = RecipeDat;
-        let Recipelen = this.currentRecipe.reqIngred.length;
+    setRecipe(recipeDat,inven){
+        this.currentRecipe = recipeDat;
+        const ingredients = this.currentRecipe.getIngredientIds();
        
-        
-        for (let x = 0; x <Recipelen;x++ ){
-            inven.requestSet(this.currentRecipe.reqIngred[x],11);
-            console.log("amount"+this.currentRecipe.reqIngred[x])
+        ingredients.forEach((ingredient) => {
 
-        }
+            inven.requestSet(ingredient, 11);
+            console.log('amount', ingredient);
+
+        })
+
         this.recmean = inven.orderedIng();
     }
 
