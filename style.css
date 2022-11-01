@@ -7,16 +7,24 @@
 
 main {
     height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#game-wrapper {
+    border: solid 2px black;
+    box-sizing: content-box;
+    width: min-content;
+    height: min-content;
 }
 
 #game-container {
     width: 500px;
     height: 700px;
     /* background-color: lightcoral; */
-    border: solid 2px black;
+
     position: relative;
 
     user-select: none;
