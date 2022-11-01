@@ -117,8 +117,9 @@ class GameEngine {
 
             for (let i = 0; i < this.gameObjects.length; i++) {
                 const object = this.gameObjects[i];
-                if (false) {
-
+                if (object.isDestroyed) {
+                    this.gameObjects.splice(i, 1);
+                    i -= 1;
                 } else {
                     object.update(delta, time, this.fullElapsedTime);
                 }
