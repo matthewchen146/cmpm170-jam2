@@ -11,51 +11,48 @@
 
 
 //The middleman between the chef and ingredients
-//Tracks ingredient production and stockpiles
-//Checks if there is enough ingredients to make a 
-//Recipe
+//Tracks ingredient production a
+
 class InventoryData {
 
     constructor(...ingredients){
         this.curSeason = 'spring';
         this.seasonbuff =[1.5,1,0,.5];
-        this.inStock = [];
+        this.inStock = Array.from(ingredients);
+        console.log("amogus,",this.inStock[0]);
+
         
-        for (let ing in ingredients){
-            
-            this.inStock.push(ing);
-        }
-       
-        this.stockCount = new Array(ingredients.length);
-        this.stockCount.fill(0);
+        
+        this.harvest = new Array(ingredients.length);
+        this.harvest.fill(0);
         this.outgoing =  new Array(ingredients.length);
         this.outgoing.fill(0);
         
     }
    
      //updates every second incrementing the total amount of produce by the yield
-    harvest(){
+    updateProduction(){
         eventEmitter.on('seasonCycle',()=>{switch(getSeason()){   
             case 'spring':
                 console.log('spring = no apple');
-                let buff=[1.5,1,0,.5];
+                let buff=[2,1.5,.5,1];
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff);
                 break;
             case 'summer':
                 console.log('summer = no pumpkin');
-                 let buff1=[.5,1.5,1,0];
+                 let buff1=[.5,2,1.5,1];
                  
                  this.seasonbuff.splice(0, this.seasonbuff.length, ...buff1);
                  break;
             case 'winter': 
             console.log('winter = no berry');
-                 let buff2=[0,.5,1.5,1];
+                 let buff2=[1,.5,2,1.5];
      
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff2);
                 break;
             case 'fall':
                 console.log('fall= no corn');
-               let buff3=[1,0,.5,1.5];
+               let buff3=[1,2,.5,1.5];
                 
                 this.seasonbuff.splice(0, this.seasonbuff.length, ...buff3);
                 break;
@@ -68,29 +65,33 @@ class InventoryData {
 
      
    
-    for(let  x = 0; x < this.stockCount.length; x++){
-        this.stockCount[x] += this.inStock[x].crop(this.seasonbuff[x.getPrimeSeason()]);  
+    for(let  x = 0; x < this.outgoing.length; x++){
+      //  console.log("achimone ahh "+this.inStock[x]);
+        this.harvest[x] = (this.inStock[x]).crop(this.seasonbuff[this.inStock[x].season])
+        console.log(this.harvest[x]);
     }  
     }
     
 
-       //chef asks for ingredients and if all are in 
-       //stock subtract that much and let them cook
+       //chef request how many things they can make 
+       //
     orderedIng(){
-        for (let x = 0 ; x <this.stockCount.length;x++) {
-            if (this.stockCount[x]<this.outgoing[x]){
-                console.log(this.stockCount[x],"sus",this.outgoing[x]);
-                return false;
+        let ingmean = 0;
+        let ingnum = 0;
+        for (let x = 0 ; x <this.harvest.length;x++) {
+
+            if (0<this.outgoing[x]){
+                
+                console.log(this.harvest[x],"sus",this.outgoing[x]);
+               ingmean += this.harvest[x];
+               ingnum +=1;
             } 
         }
-
-        for(let y = 0;y<this.stockCount.length;y++){
-            console.log(this.stockCount[y],"sussy",this.outgoing[y]);
-            this.stockCount[y]-=this.outgoing[y];
-           
-        }
+        console.log("what is the meaning of this"+ingmean.ingnum);
+        return ingmean/ingnum;
         
-        return true;
+        
+        
 
     }
 
@@ -102,11 +103,11 @@ class InventoryData {
     }
     
 
-    //Chef request ingredient amount per second 
-    //every time recipe changes or scales
-    //outgoing amounts allow for 
+    //Chef request ingredient 
+   
     requestSet(ingredient,amount){
-       let res = this.inStock.findIndex(element=>ingredient === element.getName())
+        
+       let res = this.inStock.findIndex((element) =>{ return ingredient === element.getName()})
         if (res===-1){
              console.log("ingredient not in stock!");
         }
@@ -141,8 +142,9 @@ class IngredientData {
                 break;
         }
          
-        this.level = 0;
+        
         this.yield = 1;
+        
     }
 
     getName(){
@@ -153,9 +155,6 @@ class IngredientData {
     }
     crop(passedbuff){
         return this.yield*passedbuff;
-    }
-    levelUp(){
-        this.level +=1;
     }
 
     yieldUp(){
@@ -169,15 +168,14 @@ class IngredientData {
 //holds ingredients needed
 //holds amount of ingredients needed
 //holds base selling price
-//PLEASE INITIALIZE RECIPIES WITH THE INGREDIENTS, FOLLOWED BY
-//THE NEEDED AMOUNTS 
+//PLEASE INITIALIZE RECIPIES WITH THE INGREDIENTS, 
 // example
-// Apples,pumpkins, 1 ,2;
+// Apples,pumpkins,
 class RecipeData{
     constructor(name,value,...recipelist ){
         this.name = name;
         this.reqIngred=[];
-        this.reqamount=[];
+        this.reqamount=11;
         for(let x in recipelist){
             
             
@@ -186,9 +184,7 @@ class RecipeData{
                
             
         }
-        else{
-            this.reqamount.push(recipelist[x]);
-        }
+       
     }
         this.isKnown= false;
         this.value = value;
@@ -208,7 +204,22 @@ class RecipeData{
 class PotionData{
     constructor(){
         this.potionlevel = 1;
-        
+       
+        this.upgradePrice=1000;
+    }
+    uprgadePotion(catnipcollector){
+        if(
+        catnipcollector.purchase(upgradePrice)){
+            potionlevel +=1;
+            
+            this.upgradePrice*=10;
+
+
+        }
+        else{
+            return ;
+        }
+    
     }
 
 }
@@ -218,11 +229,13 @@ class PotionData{
 //takes in recipe and requests ingredients
 //
 class ChefData {
-construcor(recipeinit){
+constructor(recipeinit){
     
     this.currentRecipe = recipeinit ;
+
     //the cat level, how many of a dish is made at a time.
     this.productionMult = 1;
+    this.recmean =0;
     
 }
     //set current recipe and tell the inventoryData what is 
@@ -232,36 +245,21 @@ construcor(recipeinit){
         this.currentRecipe = RecipeDat;
         let Recipelen = this.currentRecipe.reqIngred.length;
        
-       
+        
         for (let x = 0; x <Recipelen;x++ ){
-            inven.requestSet(this.currentRecipe.reqIngred[x],this.currentRecipe.reqamount[x]*this.productionMult);
-           // console.log("amount"+this.currentRecipe.reqIngred[x])
+            inven.requestSet(this.currentRecipe.reqIngred[x],11);
+            console.log("amount"+this.currentRecipe.reqIngred[x])
 
         }
+        this.recmean = inven.orderedIng();
     }
 
-    cookStuff(inven,cashier){
+    cookStuff(cashier,potion,inven){
         //if there is enough ingredients, make food and tell cashier
-        //to make sale
-      
-       if( inven.orderedIng()){
-        
-
-           return cashier.makeSale(this.currentRecipe.value*this.productionMult);
-       }
-       else {
-        return 0;
-       }
-       
+        //to make sal
+            inven.updateProduction();
+           return cashier.makeSale(this.currentRecipe.value*this.productionMult*this.recmean,potion);
     }
-    
-   
-
-    
-    
-
-    
-
 
 }
 //Asks if something has been cooked and calculates the total
@@ -269,22 +267,36 @@ construcor(recipeinit){
 //Tracks  levels
 class CatnipCollector{
     constructor(){
+        this.catlevel = 1;
+        this.catUpgrade = 1000;
+        this.catcrack = 0;
+    
         
-        this.levels= {potionlevel:1,applelevel:1,pumpkinlevel:1,
-            cornlevel:1,berrylevel:1};
-        
-
 
     }
 
-    makeSale(value){
+    makeSale(value,potion){
 
-        return value;
-
+        this.catcrack+= value * potion.potionlevel * this.catlevel;
+        return this.catcrack;
     }
 
     //returns false if you cant afford x
     purchase(amount){
+        if(amount>this.catcrack){
+            return false;
+        }
+        else{
+            this.catcrack-=amount;
+            return true;
+        }
+
+    }
+    upgradeCat(amount){
+       if( this.purchase(amount)){
+            this.catlevel +=1;
+            this.catUpgrade*=10;
+        }
 
     }
 
