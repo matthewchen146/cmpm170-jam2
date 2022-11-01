@@ -614,7 +614,12 @@ class DraggableGameObject extends GameObject {
     }
 
     setSnapPosition(id, x, y) {
-        this.snapPositionMap[id]?.set(x, y);
+        if (this.getSnapPosition(id)) {
+            this.snapPositionMap[id].set(x, y);
+        } else {
+            this.addSnapPosition(id, x, y);
+        }
+        
         if (this.getHomeId() === id) {
             this.setPosition(this.getHomePosition());
         }
@@ -723,8 +728,59 @@ class ButtonGameObject extends GameObject {
                 this.clickCallback(e);
             }
         }
+
+        this.isActive = false;
+        this.isHover = false;
+
+        this.defaultStyle = {
+            backgroundColor: 'lightgray'
+        };
+
+        this.hoverStyle = {
+            backgroundColor: 'linen'
+        };
+
+        this.activeStyle = {
+            backgroundColor: 'white'
+        };
+
+        const handleOver = (e) => {
+            this.isHover = true;
+            Object.assign(this.element.style, this.hoverStyle);
+        }
+
+        const handleOut = (e) => {
+            if (!this.isActive) {
+                Object.assign(this.element.style, this.defaultStyle);
+            }
+            this.isHover = false;
+        }
+
+        const handleDown = (e) => {
+            if (this.isHover) {
+                this.isActive = true;
+                Object.assign(this.element.style, this.activeStyle);
+            }
+        }
+
+        const handleUp = (e) => {
+            this.isActive = false;
+            if (this.isHover) {
+                Object.assign(this.element.style, this.hoverStyle);
+            } else {
+                Object.assign(this.element.style, this.defaultStyle);
+            }
+        }
         
         this.addEventListener('click', handleClick);
+
+        this.addEventListener('mouseover', handleOver);
+
+        this.addEventListener('mouseout', handleOut);
+
+        this.addEventListener('mousedown', handleDown);
+
+        window.addEventListener('mouseup', handleUp);
     }
 
     setClickCallback(callback) {
@@ -734,6 +790,33 @@ class ButtonGameObject extends GameObject {
 
     onClick(callback) {
         return this.setClickCallback(callback);
+    }
+
+    setDefaultStyle(style = {}, replace = false) {
+        if (replace) {
+            this.defaultStyle = style;
+        } else {
+            Object.assign(this.defaultStyle, style);
+        }
+        return this;
+    }
+
+    setHoverStyle(style = {}, replace = false) {
+        if (replace) {
+            this.hoverStyle = style;
+        } else {
+            Object.assign(this.hoverStyle, style);
+        }
+        return this;
+    }
+
+    setActiveStyle(style = {}, replace = false) {
+        if (replace) {
+            this.activeStyle = style;
+        } else {
+            Object.assign(this.activeStyle, style);
+        }
+        return this;
     }
 }
 
