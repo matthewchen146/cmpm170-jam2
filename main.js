@@ -23,6 +23,7 @@ let currency = 0;
 let inventory;
 let catChef;
 let uiObjects;
+let witchCat;
 
 const eventEmitter = new EventEmitter();
 
@@ -40,15 +41,7 @@ function preUpdate() {
 
     uiObjects = initializeUI();
 
-    // creates an image object, which is an extension of gameobject
-    // takse a src option, which is the path to the image
-    pot = new ImageGameObject({src: './assets/pot.png'})
-        .setSize(200,200)
-        .setPosition(gameContainer.centerX, 550)
-        .setOrigin(.5, .5)
     applejuice = new RecipeData('applejuice',1,'Apples',1);
-
-    // Berry 
     
     inventory = new InventoryData;
     catChef = new ChefData(applejuice);
@@ -62,6 +55,13 @@ function preUpdate() {
     currencyLabel = new GameObject({element: document.querySelector('#currency')});
 
 
+    // create the witch cat, stirring the pot
+    witchCat = new ImageGameObject({
+        src: './assets/witch-cat.gif'
+    })
+        .setSize(491, 609)
+        .setOrigin(.46, 1)
+        .setPosition(gameContainer.centerX, Game.height)
     
 }
 
@@ -73,11 +73,6 @@ function update(delta, time) {
 
     // to test this works, here is a line that logs the delta and game time
     // console.log(delta, (time / 1000).toFixed(1))
-
-    // more test code
-    pot.setPosition(gameContainer.centerX + Math.sin(time * .005) * 5)
-        .setScale(Math.cos(time * .005))
-        .rotate(.05)
        
     // anything involving something per second, place in here for now
     if(time%1000<10){
@@ -92,7 +87,7 @@ function update(delta, time) {
     currencyLabel.setProperty('textContent', `${currency.toFixed(2)} catnip`);
  
     //season
-    getSeason();
+    // getSeason();
     
 }
 
