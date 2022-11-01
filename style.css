@@ -97,6 +97,7 @@ main {
 .recipes {
     height: 450px;
     overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 .recipe-container {
@@ -105,6 +106,7 @@ main {
     column-gap: 5px;
     background-color: cornsilk;
     margin-bottom: 6px;
+    width: 320px;
 }
 
 .recipe-container .info-container {
