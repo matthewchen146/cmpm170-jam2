@@ -112,7 +112,7 @@ class InventoryData {
    
     requestSet(ingredient,amount){
         
-       let res = this.inStock.findIndex((element) =>{ return ingredient === element.getName()})
+       let res = this.inStock.findIndex((element) =>{ return ingredient === element.id})
         if (res===-1){
              console.log("ingredient not in stock!");
         }
