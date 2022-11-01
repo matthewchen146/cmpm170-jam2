@@ -166,7 +166,7 @@ function initializeUI() {
 
     const recipeBook = new RecipeBook({container: uiContainer});
 
-    fillRecipeBook(recipeBook);
+    fillRecipeBook(recipeBook, uiObjects);
 
     recipeBookButton.setClickCallback((e) => {
         recipeBook.open();
@@ -184,6 +184,7 @@ function initializeUI() {
     })
 
     uiObjects.recipeBook = recipeBook;
+    uiObjects.recipeBookButton = recipeBookButton;
     // uiObjects.recipeBookPages = recipeBookPages;
 
     // return the ui data stored in uiObjects for use in other places.
