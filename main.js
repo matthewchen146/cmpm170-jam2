@@ -54,8 +54,15 @@ function addIngredient(ingredient) {
 
         // increase the ingredient level
         ingredient.levelUp();
-        // increase the ingredient upgrade cost
-        ingredient.setCost(ingredient.cost * 2);
+
+        // add check cost functionality here
+        // to check if there is enough catnip to purchase
+        if (true) {
+            // increase the ingredient upgrade cost
+            ingredient.setCost(ingredient.cost * 2);
+
+            // decrement currency here
+        }
 
     });
 
@@ -220,7 +227,7 @@ function update(delta, time) {
     // set currency text in currency label
     currencyLabel.setText(`${currency.toFixed(2)} catnip`);
 
-    
+
 }
 
 
