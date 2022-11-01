@@ -45,14 +45,25 @@ function initializeUI() {
 
 
     // creates cutting board GameObject as a div
-    const cuttingBoard = new GameObject()
+    const cuttingBoard = new GameObject({container: ingredientsContainer})
         .setSize(450, 500)
         .setOrigin(.5, 0)
-        .setBackgroundColor('lightsalmon')
-        .setParent(ingredientsContainer)
         .setPosition(gameContainer.centerX, 100)
-        .setProperty('textContent', 'cutting board!');
 
+    const cuttingBoardBackground = new ImageGameObject({container: cuttingBoard, src: './assets/cutting-board.png'})
+        .setSize(cuttingBoard.getSize())
+
+    const craftSlotA = new GameObject({container: cuttingBoard})
+        .setSize(100, 100)
+        .setOrigin(.5, .5)
+        .setBackgroundColor('brown')
+        .setPosition(cuttingBoard.getSize().x / 2 - 100, 200)
+    
+    const craftSlotB = new GameObject({container: cuttingBoard})
+        .setSize(100, 100)
+        .setOrigin(.5, .5)
+        .setBackgroundColor('brown')
+        .setPosition(cuttingBoard.getSize().x / 2 + 100, 200)
 
     // creates ingredients / cutting board dragger, which is able to bring up the cutting board and put it down
     const ingredientsDraggerTop = 100;
@@ -80,47 +91,46 @@ function initializeUI() {
 
     uiObjects.cuttingBoardIngredients = cuttingBoardIngredients;
 
-    const ingredients = {
-        'apple': './assets/apple.png',
-        'pumpkin': './assets/pumpkin.png',
-        'corn': './assets/corn.png',
-        'berries': './assets/berries.png',
-    }
-
     const width = 100;
     const height = 100;
     const startX = width / 2;
     const endX = gameContainer.rect.width - width / 2;
 
-    const ingredientsArray = Object.entries(ingredients);
-    ingredientsArray.forEach(([name, path], i) => {
-        const position = new Vector2(
-            i / (ingredientsArray.length - 1) * (endX - startX) + width / 2, 
-            gameContainer.rect.height - height / 2
-        );
-
-        cuttingBoardIngredients[name] = new DraggableGameObject({container: uiContainer, tag: 'img'})
-            .setAttribute('src', path)
+    const addIngredient = (ingredient) => {
+        const {id, img} = ingredient;
+        cuttingBoardIngredients[id] = ingredient;
+        ingredient.draggableGameObject = new DraggableGameObject({container: uiContainer, tag: 'img'})
+            .setAttribute('src', img)
             .setSize(width, height)
             .setOrigin(.5, .5)
-            .setPosition(position)
-            .addSnapPosition('main', position)
             .setHomeId('main')
             .setSnapDistance(50)
             .setTransitionSpeed(.2)
             .setDragEnabled(false)
-    })
+            .addSnapPosition('crafta', 150, 350)
+            .addSnapPosition('craftb', 350, 350)
 
+        // refresh main positions of ingredients
+        const ingredientsArray = Object.entries(cuttingBoardIngredients);
+        ingredientsArray.forEach(([id, {draggableGameObject}], i) => {
+            const position = new Vector2(
+                (ingredientsArray.length > 1 ? (i / (ingredientsArray.length - 1)) : 0) * (endX - startX) + width / 2, 
+                gameContainer.rect.height - height / 2
+            );
+
+            draggableGameObject
+                .setSnapPosition('main', position)
+        });
+    }
 
 
     // drag event listeners for the ingredients dragger
     ingredientsDragger.on('dragstart', ({}) => {
 
-        // set the main snap position for the ingredients to their home snap position
-        // might be redundant, so it is commented out
-        // Object.values(cuttingBoardIngredients).forEach((ingredient) => {
-        //     ingredient.setSnapPosition('main', undefined, ingredientsContainer.getHomePosition().y);
-        // });
+        // move ingredients back to their stored positions
+        Object.values(cuttingBoardIngredients).forEach(({draggableGameObject}) => {
+            draggableGameObject.setHomeId('main');
+        });
     })
     .on('dragging', ({object, position, id}) => {
         
@@ -133,8 +143,8 @@ function initializeUI() {
         ingredientsContainer.setPosition(undefined, y + 50);
         
         // move ingredients up or down with the ingredient container
-        Object.values(cuttingBoardIngredients).forEach((ingredient) => {
-            ingredient.setPosition(undefined, ingredientsContainer.getPosition(true).y);
+        Object.values(cuttingBoardIngredients).forEach(({draggableGameObject}) => {
+            draggableGameObject.setPosition(undefined, ingredientsContainer.getPosition(true).y);
         });
     })
     .on('dragend', ({object, position, id}) => {
@@ -147,18 +157,18 @@ function initializeUI() {
         }
         
         // set ingredient properties in the new state
-        Object.values(cuttingBoardIngredients).forEach((ingredient) => {
+        Object.values(cuttingBoardIngredients).forEach(({draggableGameObject}) => {
 
             // set the ingredients new main snap position
             // if the ingredients are at the top (crafting mode), enable dragging
             if (id === 'top') {
                 ingredientsContainer.setPosition(undefined, ingredientsContainerTop);
-                ingredient.setSnapPosition('main', undefined, ingredientsContainerTop);
-                ingredient.setDragEnabled(true);
+                draggableGameObject.setSnapPosition('main', undefined, ingredientsContainerTop);
+                draggableGameObject.setDragEnabled(true);
             } else {
                 ingredientsContainer.setPosition(undefined, ingredientsContainerBottom);
-                ingredient.setSnapPosition('main', undefined, ingredientsContainerBottom);
-                ingredient.setDragEnabled(false);
+                draggableGameObject.setSnapPosition('main', undefined, ingredientsContainerBottom);
+                draggableGameObject.setDragEnabled(false);
             }
 
         });
@@ -183,6 +193,7 @@ function initializeUI() {
         // maybe play a sound here, or put in the recipe book itself?
     })
 
+    uiObjects.addIngredient = addIngredient;
     uiObjects.recipeBook = recipeBook;
     uiObjects.recipeBookButton = recipeBookButton;
     // uiObjects.recipeBookPages = recipeBookPages;
