@@ -22,7 +22,7 @@ let currencyLabel;
 let currency = 0;
 let inventory;
 let catChef;
-
+let uiObjects;
 
 const eventEmitter = new EventEmitter();
 
@@ -38,7 +38,7 @@ eventEmitter.trigger('seasonCycle');
 function preUpdate() {
 
 
-    const uiObjects = initializeUI();
+    uiObjects = initializeUI();
 
     // creates an image object, which is an extension of gameobject
     // takse a src option, which is the path to the image
