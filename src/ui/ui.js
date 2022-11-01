@@ -86,44 +86,6 @@ function initializeUI() {
 
 
 
-    // get the ingredients and create a draggable game object for each
-    const cuttingBoardIngredients = {};
-
-    uiObjects.cuttingBoardIngredients = cuttingBoardIngredients;
-
-    const width = 100;
-    const height = 100;
-    const startX = width / 2;
-    const endX = gameContainer.rect.width - width / 2;
-
-    const addIngredient = (ingredient) => {
-        const {id, img} = ingredient;
-        cuttingBoardIngredients[id] = ingredient;
-        ingredient.draggableGameObject = new DraggableGameObject({container: uiContainer, tag: 'img'})
-            .setAttribute('src', img)
-            .setSize(width, height)
-            .setOrigin(.5, .5)
-            .setHomeId('main')
-            .setSnapDistance(50)
-            .setTransitionSpeed(.2)
-            .setDragEnabled(false)
-            .addSnapPosition('crafta', 150, 350)
-            .addSnapPosition('craftb', 350, 350)
-
-        // refresh main positions of ingredients
-        const ingredientsArray = Object.entries(cuttingBoardIngredients);
-        ingredientsArray.forEach(([id, {draggableGameObject}], i) => {
-            const position = new Vector2(
-                (ingredientsArray.length > 1 ? (i / (ingredientsArray.length - 1)) : 0) * (endX - startX) + width / 2, 
-                gameContainer.rect.height - height / 2
-            );
-
-            draggableGameObject
-                .setSnapPosition('main', position)
-        });
-    }
-
-
     // drag event listeners for the ingredients dragger
     ingredientsDragger.on('dragstart', ({}) => {
 
@@ -175,8 +137,60 @@ function initializeUI() {
     })
 
     const recipeBook = new RecipeBook({container: uiContainer});
+    recipeBook.setStyle('zIndex', 2);
 
     fillRecipeBook(recipeBook, uiObjects);
+
+
+    // get the ingredients and create a draggable game object for each
+    const cuttingBoardIngredients = {};
+
+    uiObjects.cuttingBoardIngredients = cuttingBoardIngredients;
+
+    const width = 100;
+    const height = 100;
+    const startX = width / 2;
+    const endX = gameContainer.rect.width - width / 2;
+
+
+    // uses ingredientData
+    // creates a draggableGameObject of the ingredient and stores it in the ingredientData
+    // creates a uprade option for it in the upgrades page
+    const addIngredient = (ingredient) => {
+        const {id, img} = ingredient;
+        cuttingBoardIngredients[id] = ingredient;
+
+        // add to upgrades
+        const {upgradeButton, levelLabel, upgradeIcon} = uiObjects.upgradePageData.addUpgrade(ingredient);
+
+        // create draggable game object
+        const draggableGameObject = new DraggableGameObject({container: uiContainer, tag: 'img'})
+            .setAttribute('src', img)
+            .setSize(width, height)
+            .setOrigin(.5, .5)
+            .setHomeId('main')
+            .setSnapDistance(50)
+            .setTransitionSpeed(.2)
+            .setDragEnabled(false)
+            .addSnapPosition('crafta', 150, 350)
+            .addSnapPosition('craftb', 350, 350)
+
+        ingredient.draggableGameObject = draggableGameObject;
+
+        // refresh main positions of ingredients
+        const ingredientsArray = Object.entries(cuttingBoardIngredients);
+        ingredientsArray.forEach(([id, {draggableGameObject}], i) => {
+            const position = new Vector2(
+                (ingredientsArray.length > 1 ? (i / (ingredientsArray.length - 1)) : 0) * (endX - startX) + width / 2, 
+                gameContainer.rect.height - height / 2
+            );
+
+            draggableGameObject
+                .setSnapPosition('main', position)
+        });
+
+        return {draggableGameObject, upgradeButton, levelLabel, upgradeIcon};
+    }
 
     recipeBookButton.setClickCallback((e) => {
         recipeBook.open();

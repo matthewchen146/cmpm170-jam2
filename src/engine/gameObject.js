@@ -346,6 +346,10 @@ class GameObject {
         return this;
     }
 
+    set textContent(text) {
+        this.setText(text);
+    }
+
     setClass(key, value) {
         this.element.classList.toggle(key, value);
         return this;
@@ -589,11 +593,12 @@ class DraggableGameObject extends GameObject {
                 return;
             }
             this.isDragging = false;
+            const lastId = this.homeId;
             if (this.currentId) {
                 this.homeId = this.currentId;
             }
             this.setPosition(this.getHomePosition());
-            this.events.trigger('dragend', {object: this, position: this.dragPosition.copy(), id: this.homeId});
+            this.events.trigger('dragend', {object: this, position: this.dragPosition.copy(), id: this.homeId, lastId});
         });
 
     }

@@ -177,57 +177,73 @@ function initializeUpgradePage(recipeBook) {
     // ITEMS (their icon only) - LEVEL - UPGRADE BUTTON (with cost)
     // ex: CAT - LVL 99 - [250 catnip]
     // currently contains example data
-    const itemData = [
-        {
-            id: 'cat',
-            icon: './assets/cat-head.png',
-        },
-        {
-            id: 'apple',
-            icon: './assets/apple.png',
-        },
-        {
-            id: 'pumpkin',
-            icon: './assets/pumpkin.png',
-        },
-        {
-            id: 'corn',
-            icon: './assets/corn.png',
-        },
-        {
-            id: 'berries',
-            icon: './assets/berries.png',
-        },
-        {
-            id: 'potion',
-            icon: './assets/potion.png',
-            cost: 100
-        },
-    ]
-    itemData.forEach(({id, icon, level, cost}) => {
+    // const itemData = [
+    //     {
+    //         id: 'cat',
+    //         icon: './assets/cat-head.png',
+    //     },
+    //     {
+    //         id: 'apple',
+    //         icon: './assets/apple.png',
+    //     },
+    //     {
+    //         id: 'pumpkin',
+    //         icon: './assets/pumpkin.png',
+    //     },
+    //     {
+    //         id: 'corn',
+    //         icon: './assets/corn.png',
+    //     },
+    //     {
+    //         id: 'berries',
+    //         icon: './assets/berries.png',
+    //     },
+    //     {
+    //         id: 'potion',
+    //         icon: './assets/potion.png',
+    //         cost: 100
+    //     },
+    // ]
+    // itemData.forEach(({id, icon, level, cost}) => {
+        
+    // });
+
+
+    // adds object (which is usually an ingredient) to the upgrades page to be upgraded
+    function addUpgrade(object) {
+        const {id, level, cost, img} = object;
+
         const imgContainer = document.createElement('div');
         imgContainer.style.justifyContent = 'center';
         grid.appendChild(imgContainer);
-        const img = document.createElement('img');
-        img.setAttribute('src', icon);
-        img.style.width = 50;
-        img.style.height = 50;
-        imgContainer.appendChild(img);
+        const icon = document.createElement('img');
+        icon.setAttribute('src', img);
+        icon.style.width = 50;
+        icon.style.height = 50;
+        imgContainer.appendChild(icon);
         
 
-        const text = document.createElement('div');
-        text.textContent = `${level || 0}`;
-        grid.appendChild(text);
+        const label = document.createElement('div');
+        label.textContent = `${level || 1}`;
+        grid.appendChild(label);
 
         const button = new ButtonGameObject({
             container: grid,
             positionMode: GameObject.PositionModes.NONE,
         })
             .setSize(80, 50)
-            .setText(`${cost || 0} catnip`)
+            .setText(`${cost || 1} catnip`)
         
-            upgradePageData[id] = {button, levelText: text, img};
-    });
+        // store the upgrade button in the object
+        object.upgradeButton = button;
+        object.levelLabel = label;
+
+        upgradePageData[id] = {upgradeButton: button, levelLabel: label, upgradeIcon: icon};
+
+        return upgradePageData[id];
+    }
+
+    upgradePageData.addUpgrade = addUpgrade;
 
     return upgradePageData;
 }

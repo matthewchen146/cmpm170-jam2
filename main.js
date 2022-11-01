@@ -32,8 +32,57 @@ let selectedRecipes = [];
 let selectedRecipe;
 let possibleIngredients = {};
 
+const craftSlots = {
+    crafta: undefined,
+    craftb: undefined
+}
+
+/** 
+ * handles adding an ingredient to the GAME
+ * returns {
+ * 
+ * draggableGameObject, upgradeButton, levelLabel, upgradeIcon,
+ * 
+ * }
+ */
 function addIngredient(ingredient) {
-    return uiObjects.addIngredient(ingredient);
+    const data = uiObjects.addIngredient(ingredient);
+    const {draggableGameObject, upgradeButton} = data;
+
+    // add upgrade button functionality
+    upgradeButton.onClick(() => {
+
+        // increase the ingredient level
+        ingredient.levelUp();
+        // increase the ingredient upgrade cost
+        ingredient.setCost(ingredient.cost * 2);
+
+    });
+
+    // add crafting functionality
+    draggableGameObject.on('dragend', ({object, id, lastId}) => {
+        // id references the snap id
+        if (id === 'crafta' || id === 'craftb') {
+            // remove self from old craft slot
+            if (lastId !== 'main' && craftSlots[lastId] === ingredient) {
+                craftSlots[lastId] = undefined;
+            }
+
+            // replace craft slot in new id
+            if (craftSlots[id]) {
+                craftSlots[id].draggableGameObject.setHomeId('main');
+            }
+            craftSlots[id] = ingredient;
+        } else {
+            // id = main
+            if (lastId !== 'main' && craftSlots[lastId] === ingredient) {
+                craftSlots[lastId] = undefined;
+            }
+        }
+        
+    });
+
+    return data;
 }
 
 function getIngredient(id) {
@@ -47,6 +96,7 @@ function getRecipe(id) {
     return availableRecipes[id];
 }
 
+// handles adding a recipe to the GAME
 function addRecipe(recipe) {
     const {selectButton} = uiObjects.recipePageData.addRecipe(recipe);
     recipe.selectButton = selectButton;
@@ -107,7 +157,9 @@ function preUpdate() {
 
     // adds the ingredients
     Object.entries(possibleIngredients).forEach(([id, ingredient]) => {
+
         addIngredient(ingredient);
+
     })
     
 

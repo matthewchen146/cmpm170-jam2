@@ -130,6 +130,14 @@ class IngredientData {
         this.id = id;
         this.name = options.name || id;
         this.img = options.img || '';
+
+        // starting level
+        this.level = options.level || 1;
+        this.levelLabel;
+
+        // starting upgrade cost
+        this.cost = options.cost || 1;
+        this.upgradeButton;
         
         // gets the season number from the seasonsEnum based on the season name
         // if it's not a valid season name, it defaults to 0 (spring)
@@ -155,7 +163,26 @@ class IngredientData {
 
     }
 
-    
+    setLevel(level) {
+        this.level = level;
+        if (this.levelLabel) {
+            this.levelLabel.textContent = `${this.level}`;
+        }
+        return this;
+    }
+
+    levelUp(levels = 1) {
+        this.setLevel(this.level + levels);
+        return this;
+    }
+
+    setCost(cost) {
+        this.cost = cost;
+        if (this.upgradeButton) {
+            this.upgradeButton.textContent = `${this.cost} catnip`;
+        }
+        return this;
+    }
 }
 
 //holds ingredients needed
