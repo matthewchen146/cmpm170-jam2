@@ -48,7 +48,7 @@ function preUpdate() {
         .setOrigin(.5, .5)
     applejuice = new RecipeData('applejuice',1,'Apples',1);
 
-    Berry 
+    // Berry 
     
     inventory = new InventoryData;
     catChef = new ChefData(applejuice);
