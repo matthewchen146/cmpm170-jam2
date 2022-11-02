@@ -202,20 +202,23 @@ function preUpdate() {
     catChef = new ChefData({
         img: './assets/cat-head.png',
         costFunction: (level) => {
-            return Math.pow(10, level);
+            return Math.pow(10, level) + level * 1000;
         },
 
         // modify the multiplier of the catchef
         productionMultiplier: 1
     });
 
-    catChef.setRecipe(getRecipe('applejuice'));
+    
+    const startRecipe = getRecipe('applejuice');
+    catChef.setRecipe(startRecipe);
+    startRecipe.selectButton?.setText('Cooking');
 
 
     potion = new PotionData({
         img: './assets/potion.png',
         costFunction: (level) => {
-            return Math.pow(10, level);
+            return Math.pow(10, level) + level * 1000;
         },
 
         // set the base multiplier of the potion
