@@ -3,6 +3,7 @@ const rawRecipes = {
         ingredients: {
             apple: 1
         },
+        value: 100,
         name: 'Apple Juice',
         img: 'https://www.martinellis.com/wp-content/uploads/2017/03/bottle-apple-juice-glass-with-no-label-10oz_750x591-240x0-c-default.png',
         isKnown: true

@@ -30,7 +30,6 @@ let potion;
 const eventEmitter = new EventEmitter();
 
 let selectedRecipes = [];
-let selectedRecipe;
 let possibleIngredients = {};
 
 const craftSlots = {
@@ -106,22 +105,21 @@ function addRecipe(recipe) {
     recipe.selectButton = selectButton;
 
     selectButton.onClick(() => {
-        if (recipe === selectedRecipe) {
+        if (recipe === catChef.getRecipe()) {
             return;
         }
 
         openBook.play();
 
-        catChef.setRecipe(recipe);
-
-        if (selectedRecipe) {
+        if (catChef.getRecipe()) {
             // reset previous recipe button's state
-            selectedRecipe.selectButton.setText('Cook');    
+            catChef.getRecipe().selectButton.setText('Cook');    
         }
+
+        catChef.setRecipe(recipe);
 
         // set the current recipe button's state
         selectButton.setText('Cooking');
-        selectedRecipe = recipe;
     })
 }
 
@@ -209,6 +207,8 @@ function preUpdate() {
     });
 
     
+    // initial recipe that is being cooked
+    // optional
     const startRecipe = getRecipe('applejuice');
     catChef.setRecipe(startRecipe);
     startRecipe.selectButton?.setText('Cooking');
@@ -253,6 +253,57 @@ function preUpdate() {
         })
     }
     
+
+    // clear the craft slot's references when the cutting board is dragged
+    uiObjects.ingredientsDragger.on('dragstart', () => {
+        craftSlots.crafta = undefined;
+        craftSlots.craftb = undefined;
+    })
+
+    // setup craft button and crafting
+    uiObjects.craftButton.onClick(() => {
+
+        const ingredients = {}
+        
+        let count = 0;
+        // add initial ingredients
+        if (craftSlots.crafta) {
+            const {id} = craftSlots.crafta;
+            ingredients[id] = 1;
+            count += 1;
+        }
+        if (craftSlots.craftb) {
+            const {id} = craftSlots.craftb;
+            ingredients[id] = 1;
+            count += 1;
+        }
+
+        // console.log(ingredients)
+
+        if (count <= 0) {
+            console.log('no ingredients set!');
+            return;
+        }
+
+        // find a recipe in possible recipes that has the same ingredients
+        let foundRecipe;
+        for (const recipe of Object.values(possibleRecipes)) {
+            if (!recipe.isKnown && recipe.checkIngredients(ingredients)) {
+                foundRecipe = recipe;
+                break;
+            }
+        }
+
+        if (foundRecipe) {
+            console.log('recipe found!', foundRecipe.name);
+            foundRecipe.isKnown = true;
+            addRecipe(foundRecipe);
+        } else {
+            console.log('could not find recipe...');
+        }
+
+    });
+
 
     // detect a season change, and modify the current season
     calendar.events.on('seasonchange', ({season}) => {

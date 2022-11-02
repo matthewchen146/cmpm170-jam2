@@ -671,6 +671,7 @@ class DraggableGameObject extends GameObject {
 
     setHomeId(id) {
         this.homeId = id;
+        this.events.trigger('homechange', {object: this, id: this.homeId});
         this.setPosition(this.getHomePosition());
         return this;
     }

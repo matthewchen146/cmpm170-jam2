@@ -67,6 +67,15 @@ function initializeUI() {
         .setOrigin(.5, .5)
         .setBackgroundColor('brown')
         .setPosition(cuttingBoard.getSize().x / 2 + 100, 200)
+    
+    const craftButton = new ButtonGameObject({container: cuttingBoard})
+        .setSize(150, 100)
+        .setText('Craft')
+        .setOrigin(.5, .5)
+        .setPosition(cuttingBoard.getSize().x / 2, 350)
+        .setClass('craft-button', true)
+
+    uiObjects.craftButton = craftButton;
 
     // creates ingredients / cutting board dragger, which is able to bring up the cutting board and put it down
     const ingredientsDraggerTop = 100;

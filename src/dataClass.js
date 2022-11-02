@@ -227,12 +227,10 @@ class RecipeData {
                 return {ingredient, quantity: amt};
             }
         });
-        this.value = options.value || 1;
+        this.value = options.value || options.baseMultiplier || 1;
 
         // reference to the select button on the recipe page of the book
         this.selectButton;
-
-        this.reqamount = 11;
 
         this.isKnown = options.isKnown || false;
     }
@@ -251,8 +249,21 @@ class RecipeData {
             meanValue = meanValue + quantity * (ingredient.getValue(season) - meanValue) / count;
 
         })
+
+        meanValue *= this.value;
         
         return meanValue;
+    }
+
+    checkIngredients(ingredients = {}) {
+        let match = true;
+        for (const [id, amt] of Object.entries(this.ingredients)) {
+            if (!(amt > 0 && ingredients[id] && ingredients[id] === amt)) {
+                match = false;
+                break;
+            }
+        }
+        return match;
     }
 }
 
@@ -300,6 +311,10 @@ constructor(options = {}){
         return this;
     }
 
+    getRecipe() {
+        return this.currentRecipe;
+    }
+
     setPotion(potion) {
         this.potion = potion;
         return this;
@@ -312,7 +327,6 @@ constructor(options = {}){
 
     getRate(recipe = this.currentRecipe, season) {
         if (!recipe) {
-            console.error('cat cant cook nothing!');
             return 0;
         }
 

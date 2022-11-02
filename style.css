@@ -209,3 +209,16 @@ main {
     justify-content: center;
     align-items: center;
 }
+
+
+
+/* crafting and cutting board */
+
+.craft-button {
+
+    font-size: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
