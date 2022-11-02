@@ -184,7 +184,8 @@ function preUpdate() {
 
     // create recipes
     availableRecipes['applejuice'] = new RecipeData('applejuice', { apple: 1 }, { 
-        name: 'Apple Juice' 
+        name: 'Apple Juice',
+        img: 'https://www.martinellis.com/wp-content/uploads/2017/03/bottle-apple-juice-glass-with-no-label-10oz_750x591-240x0-c-default.png'
     });
     availableRecipes['pumpkinpie'] = new RecipeData('pumpkinpie', { pumpkin: 1 }, { 
         name: 'Pumpkin Pie',
