@@ -209,9 +209,12 @@ function preUpdate() {
     
     // initial recipe that is being cooked
     // optional
-    const startRecipe = getRecipe('applejuice');
-    catChef.setRecipe(startRecipe);
-    startRecipe.selectButton?.setText('Cooking');
+    const startRecipe = getRecipe('caramelapple');
+    if (startRecipe) {
+        catChef.setRecipe(startRecipe);
+        startRecipe.selectButton?.setText('Cooking');
+    }
+    
 
 
     potion = new PotionData({

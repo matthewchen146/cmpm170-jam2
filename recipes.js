@@ -1,11 +1,11 @@
 const rawRecipes = {
-    applejuice: {
+    caramelapple: {
         ingredients: {
             apple: 1
         },
         value: 1,
-        name: 'Apple Juice',
-        img: 'https://www.martinellis.com/wp-content/uploads/2017/03/bottle-apple-juice-glass-with-no-label-10oz_750x591-240x0-c-default.png',
+        name: 'Caramel Apple',
+        img: './assets/recipes/caramel-apple.png',
         isKnown: true
     },
     pumpkinpie: {
@@ -17,22 +17,22 @@ const rawRecipes = {
         img: './assets/recipes/pumpkin-pie.png',
         isKnown: true
     },
-    cornpie: {
+    corncake: {
         ingredients: {
             corn: 1
         },
         value: 1,
-        name: 'Corn Pie',
-        img: '',
+        name: 'Corn Cake',
+        img: './assets/recipes/corn-cake.png',
         isKnown: true
     },
-    berrypie: {
+    cranberrytart: {
         ingredients: {
             berries: 1
         },
         value: 1,
-        name: 'Berry Pie',
-        img: '',
+        name: 'Cranberry Tart',
+        img: './assets/recipes/cranberry-tart.png',
         isKnown: true
     },
     applepumpkinpie: {

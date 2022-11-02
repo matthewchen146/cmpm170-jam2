@@ -22,8 +22,8 @@ function initializeUI() {
     // creates recipe book button
     const recipeBookButton = new ButtonGameObject({container: uiContainer, tag: 'img'})
         .setAttribute('src', './assets/book-small.png')
-        .setPosition(Game.width - 60, 200)
-        .setSize(100,150)
+        .setPosition(Game.width - 70, 90)
+        .setSize(125,125)
         .setOrigin(.5, .5)
         .setDefaultStyle({
             transform: `scale(1)`
