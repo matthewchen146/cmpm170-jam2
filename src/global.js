@@ -23,6 +23,8 @@ function initializeGlobal() {
     
         Game.width = rect.width;
         Game.height = rect.height;
+        Game.centerX = Game.width / 2;
+        Game.centerY = Game.height / 2;
         Game.left = rect.left;
         Game.top = rect.top;
         Game.x = rect.x;
