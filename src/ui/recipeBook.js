@@ -17,7 +17,7 @@ class RecipeBook extends GameObject {
             .setBackgroundColor('beige')
             .setSize(450, 600)
             .setOrigin(.5, .5)
-            .setPosition(gameContainer.centerX, gameContainer.centerY)
+            .setPosition(Game.centerX, Game.centerY)
 
         this.defaultBackground = new ImageGameObject({container: this, src: './assets/book-page.png'})
             .setSize(this.getSize())
@@ -27,33 +27,46 @@ class RecipeBook extends GameObject {
         this.isOpen = false;
 
         // create close book button, which hides the book if its open
-        this.closeButton = new ButtonGameObject({container: this})
-            .setText('close')
-            .setPosition(450, 0)
-            .setOrigin(1,0)
-            .setBackgroundColor('pink')
+        this.closeButton = new ButtonGameObject({tag: 'img', container: this})
+            .setAttribute('src', './assets/x.png')
+            .setText('')
+            .setPosition(440, 10)
+            .setSize(50, 50)
+            .setOrigin(.5, .5)
+            // .setBackgroundColor('pink')
             .setClickCallback((e) => {
                 this.close();
             })
+            .setDefaultStyle({transform: `scale(1, 1)`}, true)
+            .setHoverStyle({transform: `scale(1.25, 1.25)`}, true)
+            .setActiveStyle({transform: `scale(1.5, 1.5)`}, true)
 
 
         // create page flipping buttons
         // they are visible in the book
         this.nextPageButton = new ButtonGameObject({container: this})
-            .setText('next')
-            .setPosition(this.getSize().x, 300)
-            .setSize(50,30)
+            .setText('')
+            .setPosition(this.getSize().x + 20, 300)
+            .setSize(50,50)
             .setOrigin(1,.5)
-            .setBackgroundColor('coral')
+            // .setBackgroundColor('coral')
             .setClickCallback((e) => { this.nextPage(); })
+            .setDefaultStyle({transform: `scale(1, 1)`}, true)
+            .setHoverStyle({transform: `scale(1.25, 1.25)`}, true)
+            .setActiveStyle({transform: `scale(1.5, 1.5)`}, true)
+            .setStyle('backgroundImage', 'url("./assets/arrow-right.png")')
 
         this.prevPageButton = new ButtonGameObject({container: this})
-            .setText('prev')
-            .setPosition(0, 300)
-            .setSize(50,30)
+            .setText('')
+            .setPosition(0 - 20, 300)
+            .setSize(50,50)
             .setOrigin(0,.5)
-            .setBackgroundColor('coral')
+            // .setBackgroundColor('coral')
             .setClickCallback((e) => { this.prevPage(); })
+            .setDefaultStyle({transform: `scale(-1, 1)`}, true)
+            .setHoverStyle({transform: `scale(-1.25, 1.25)`}, true)
+            .setActiveStyle({transform: `scale(-1.5, 1.5)`}, true)
+            .setStyle('backgroundImage', 'url("./assets/arrow-right.png")')
     }
 
     // get the array of pages. not a duplicate
