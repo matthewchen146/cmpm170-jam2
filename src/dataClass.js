@@ -8,10 +8,10 @@
 //INVENTORY DYNAMICALLY
 
 const seasonsEnum = {
-    spring: 0,
-    summer: 1,
-    fall: 2,
-    winter: 3
+    winter: 0,
+    spring: 1,
+    summer: 2,
+    fall: 3,
 }
 
 
@@ -122,30 +122,76 @@ class InventoryData {
     }
 }
 
-//Ingredients are given to inventory dynamically
-//Season buff is given by inventory based on 
-class IngredientData {
-    constructor(id, options = {}){
+/**
+ * UpgradeableData class
+ * can be extended by other classes if they are upgradeable
+ * or they can be used as a component inside a class
+ */
+class UpgradeableData {
+    constructor(options = {}) {
+        this.level = options.level || 1;
+        this.costFunction = options.costFunction || ((level) => { return level; });
+        this.cost = this.costFunction(this.level);
+        this.unit = options.unit || 'catnip';
         
-        this.id = id;
-        this.name = options.name || id;
+        // icon to be displayed
         this.img = options.img || '';
 
-        // starting level
-        this.level = options.level || 1;
+        // game objects that will update on change
         this.levelLabel;
-
-        // starting upgrade cost
-        this.cost = options.cost || 1;
         this.upgradeButton;
+
+        this.events = new EventEmitter();
+    }
+
+    calculateCost(level) {
+        return this.costFunction(level);
+    }
+
+    updateCost(level = this.level) {
+        this.cost = this.calculateCost(level);
+        if (this.upgradeButton) {
+            this.upgradeButton.setText(`${this.cost} ${this.unit}`);
+        }
+        return this;
+    }
+
+    setLevel(level) {
+        this.level = level;
+        if (this.levelLabel) {
+            this.levelLabel.textContent = `${this.level}`;
+        }
+        this.updateCost();
+        return this;
+    }
+
+    levelUp(levels = 1) {
+        return this.setLevel(this.level + levels);
+    }
+}
+
+//Ingredients are given to inventory dynamically
+//Season buff is given by inventory based on 
+class IngredientData extends UpgradeableData {
+    static possibleIngredients = {}
+
+    constructor(id, options = {}){
+        super(options);
+        this.id = id;
+        this.name = options.name || id;
         
         // gets the season number from the seasonsEnum based on the season name
-        // if it's not a valid season name, it defaults to 0 (spring)
+        // if it's not a valid season name, it defaults to 0 (winter)
         this.season = seasonsEnum[options.season] || 0;
-         
+
+        // i think this will be used instead of season above
+        // represents a multiplier for the value based on the season
+        // they are indexed as winter, spring, summer, fall
+        this.seasonBuff = options.seasonBuff || [1,1,1,1];
         
         this.yield = 1;
         
+        this.baseValue = options.baseValue || 10;
     }
 
     getName(){
@@ -163,25 +209,9 @@ class IngredientData {
 
     }
 
-    setLevel(level) {
-        this.level = level;
-        if (this.levelLabel) {
-            this.levelLabel.textContent = `${this.level}`;
-        }
-        return this;
-    }
-
-    levelUp(levels = 1) {
-        this.setLevel(this.level + levels);
-        return this;
-    }
-
-    setCost(cost) {
-        this.cost = cost;
-        if (this.upgradeButton) {
-            this.upgradeButton.textContent = `${this.cost} catnip`;
-        }
-        return this;
+    getValue(season = IngredientData.season || this.season) {
+        const currentSeason = season;
+        return this.level * this.seasonBuff[currentSeason] * this.baseValue;
     }
 }
 
@@ -198,6 +228,12 @@ class RecipeData {
         this.name = options.name || id;
         this.img = options.img || ''; //'./assets/recipes/default.png';
         this.ingredients = ingredients;
+        this.ingredientsData = Object.entries(this.ingredients).map(([id, amt]) => {
+            const ingredient = IngredientData.possibleIngredients[id];
+            if (ingredient) {
+                return {ingredient, quantity: amt};
+            }
+        });
         this.value = options.value || 1;
 
         // reference to the select button on the recipe page of the book
@@ -211,6 +247,20 @@ class RecipeData {
     getIngredientIds() {
         return Object.keys(this.ingredients);
     }
+
+    // calculate the value of the recipe based on the ingredients and season
+    getValue(season) {
+        let meanValue = 0;
+        let count = 0;
+        this.ingredientsData.forEach(({ingredient, quantity}) => {
+            
+            count += quantity;
+            meanValue = meanValue + quantity * (ingredient.getValue(season) - meanValue) / count;
+
+        })
+        
+        return meanValue;
+    }
 }
 
 
@@ -221,37 +271,30 @@ class RecipeData {
 //recipies rely on potions.
 //no need to have anything other than chef 
 //knowing about it.
-class PotionData{
-    constructor(){
-        this.potionlevel = 1;
-       
-        this.upgradePrice=1000;
-    }
-    uprgadePotion(catnipcollector){
-        if(
-        catnipcollector.purchase(upgradePrice)){
-            potionlevel +=1;
-            
-            this.upgradePrice*=10;
+class PotionData extends UpgradeableData {
+    constructor(options = {}) {
+        super(options);
 
-
-        }
-        else{
-            return ;
-        }
-    
+        this.baseValue = options.baseValue || 10;
     }
 
+    getMultiplier() {
+        return this.level * this.baseValue;
+    }
 }
 
 
 
 //takes in recipe and requests ingredients
 //
-class ChefData {
-constructor(recipeinit){
+class ChefData extends UpgradeableData {
+constructor(options = {}){
+    super(options);
     
-    this.currentRecipe = recipeinit ;
+    this.currentRecipe;
+    this.potion;
+
+    this.currency = 0;
 
     //the cat level, how many of a dish is made at a time.
     this.productionMult = 1;
@@ -261,97 +304,46 @@ constructor(recipeinit){
     //set current recipe and tell the inventoryData what is 
     //needed
     //ALWAYS SET RECIPE BEFORE UPDATING
-    setRecipe(recipeDat,inven){
-        this.currentRecipe = recipeDat;
-        const ingredients = this.currentRecipe.getIngredientIds();
-       
-        ingredients.forEach((ingredient) => {
-
-            inven.requestSet(ingredient, 11);
-            console.log('amount', ingredient);
-
-        })
-
-        this.recmean = inven.orderedIng();
+    setRecipe(recipe){
+        this.currentRecipe = recipe;
+        return this;
     }
 
-    cookStuff(cashier,potion,inven){
-        //if there is enough ingredients, make food and tell cashier
-        //to make sal
-            inven.updateProduction();
-           return cashier.makeSale(this.currentRecipe.value*this.productionMult*this.recmean,potion);
+    setPotion(potion) {
+        this.potion = potion;
+        return this;
     }
 
-}
-//Asks if something has been cooked and calculates the total
-//catnip gained and in the bank
-//Tracks  levels
-class CatnipCollector{
-    constructor(){
-        this.catlevel = 1;
-        this.catUpgrade = 1000;
-        this.catcrack = 0;
-    
-        
-
+    // this will essentially return how many recipes can be made in a second based on the level
+    getMultiplier() {
+        return this.level * 1;
     }
 
-    makeSale(value,potion){
-
-        return value * potion.potionlevel * this.catlevel;
-        //return this.catcrack;
-    }
-
-    //returns false if you cant afford x
-    purchase(amount){
-        if(amount>this.catcrack){
-            return false;
-        }
-        else{
-            this.catcrack-=amount;
-            return true;
+    getRate(recipe = this.currentRecipe, season) {
+        if (!recipe) {
+            console.error('cat cant cook nothing!');
+            return 0;
         }
 
-    }
-    upgradeCat(amount){
-       if( this.purchase(amount)){
-            this.catlevel +=1;
-            this.catUpgrade*=10;
+        // calculate the final output currency
+        let output = recipe.getValue(season);
+
+        if (this.potion) {
+            output = output * this.potion.getMultiplier();
         }
 
+        output = output * this.getMultiplier();
+
+        return output;
     }
 
+    cook(recipe = this.currentRecipe, season) {
 
+        const output = this.getRate(recipe, season);        
 
-
-
+        return output;
+    }
 }
-
-//THE TOP DOG
-//contains list of all the recipies and 
-//a list of all recipies the player knows
-//contains current recipe selected and 
-//sends relevant data to all classes who need it.
-//
-class Grimoire{
-    constructor(){
-         
-        
-
-    }
-    //runs all of the variables that consume ingredients
-    storesopen(chef,cashier,inventory){
-        //
-    }
-    storeclosed(){
-
-    }
-
-}
-
-
-
-
 
 
 
