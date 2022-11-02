@@ -24,7 +24,7 @@ class InventoryData {
         this.curSeason = 'spring';
         this.seasonbuff =[1.5,1,0,.5];
         this.inStock = Array.from(ingredients);
-        console.log("amogus,",this.inStock[0]);
+        
 
         
         
@@ -298,8 +298,8 @@ class CatnipCollector{
 
     makeSale(value,potion){
 
-        this.catcrack+= value * potion.potionlevel * this.catlevel;
-        return this.catcrack;
+        return value * potion.potionlevel * this.catlevel;
+        //return this.catcrack;
     }
 
     //returns false if you cant afford x
