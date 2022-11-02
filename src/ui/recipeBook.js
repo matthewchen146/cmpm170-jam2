@@ -160,12 +160,14 @@ class RecipeBook extends GameObject {
     // flip to next page
     nextPage() {
         this.flipToPage(this.pageIndex + 1);
+        flipPage.play();
         return this;
     }
     
     // flip to previous page
     prevPage() {
         this.flipToPage(this.pageIndex - 1);
+        flipPage.play();
         return this;
     }
 
@@ -178,6 +180,7 @@ class RecipeBook extends GameObject {
         this.flipToPage(page);
         this.isOpen = true;
         this.events.trigger('open');
+        openBook.play();
         return this;
     }
 
@@ -189,6 +192,7 @@ class RecipeBook extends GameObject {
         this.setVisible(false);
         this.isOpen = false;
         this.events.trigger('close');
+        closeBook.play();
         return this;
     }
 }

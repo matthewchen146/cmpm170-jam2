@@ -10,6 +10,11 @@ const gameContainer = {
 gameContainer.centerX = gameContainer.rect.width / 2;
 gameContainer.centerY = gameContainer.rect.height / 2;
 
+const openBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5804");
+const closeBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5765")
+const flipPage = new Audio("https://www.fesliyanstudios.com/play-mp3/5477");
+
+const audio1 = new Audio("assets/sounds/512131__beezlefm__coins-small-sound.wav")
 
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
@@ -54,6 +59,9 @@ function addIngredient(ingredient) {
 
         // increase the ingredient level
         ingredient.levelUp();
+
+        audio1.play;
+        
 
         // add check cost functionality here
         // to check if there is enough catnip to purchase
@@ -112,6 +120,8 @@ function addRecipe(recipe) {
         if (recipe === selectedRecipe) {
             return;
         }
+
+        openBook.play();
 
         catChef.setRecipe(recipe, inventory);
 
