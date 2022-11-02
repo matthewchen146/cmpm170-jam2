@@ -2,13 +2,6 @@
 // sets the GameObject static default container to the selected container below
 GameObject.defaultContainer = document.querySelector('#game-object-container');
 
-// gameContainer information, for easy access
-const gameContainer = {
-    element: GameObject.defaultContainer,
-    rect: GameObject.defaultContainer.getBoundingClientRect()
-}
-Game.centerX = gameContainer.rect.width / 2;
-gameContainer.centerY = gameContainer.rect.height / 2;
 
 const openBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5804");
 const closeBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5765")
