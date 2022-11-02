@@ -1,6 +1,4 @@
 
-// let testDrag
-
 let uiInitialized = false;
 
 // initialize the ui
@@ -17,24 +15,29 @@ function initializeUI() {
     // container that holds ui elements. this is always on top
     const uiContainer = document.querySelector('#ui-container');
 
-    // testDrag = new DraggableGameObject({container: uiContainer})
-    // .setSize(100, 100)
-    // .setStyle('backgroundColor', 'coral')
-    // .setOrigin(.5, .5)
-
+    uiObjects.currencyContainer = document.querySelector('#currency-container');
+    uiObjects.currencyLabel = document.querySelector('#currency');
+    uiObjects.currencyRateLabel = document.querySelector('#currency-rate');
 
     // creates recipe book button
     const recipeBookButton = new ButtonGameObject({container: uiContainer, tag: 'img'})
         .setAttribute('src', './assets/book-small.png')
-        .setPosition(gameContainer.rect.width - 60, 200)
-        .setBackgroundColor('')
+        .setPosition(Game.width - 60, 200)
         .setSize(100,150)
         .setOrigin(.5, .5)
+        .setDefaultStyle({
+            transform: `scale(1)`
+        }, true)
+        .setHoverStyle({
+            transform: `scale(1.1)`
+        }, true)
+        .setActiveStyle({}, true)
+        .setStyle('transition', 'transform 100ms')
         
 
     // gets / creates ingredients container as a new GameObject
     const ingredientsContainerTop = 50;
-    const ingredientsContainerBottom = gameContainer.rect.height - 50;
+    const ingredientsContainerBottom = Game.height - 50;
 
     const ingredientsContainer = new GameObject({container: uiContainer})
         // .setId('ingredients')
@@ -48,7 +51,7 @@ function initializeUI() {
     const cuttingBoard = new GameObject({container: ingredientsContainer})
         .setSize(450, 500)
         .setOrigin(.5, 0)
-        .setPosition(gameContainer.centerX, 100)
+        .setPosition(Game.centerX, 100)
 
     const cuttingBoardBackground = new ImageGameObject({container: cuttingBoard, src: './assets/cutting-board.png'})
         .setSize(cuttingBoard.getSize())
@@ -67,19 +70,19 @@ function initializeUI() {
 
     // creates ingredients / cutting board dragger, which is able to bring up the cutting board and put it down
     const ingredientsDraggerTop = 100;
-    const ingredientsDraggerBottom = gameContainer.rect.height - 100;
+    const ingredientsDraggerBottom = Game.height - 100;
     const ingredientsDragger = new DraggableGameObject({container: uiContainer, tag: 'img'})
         .setAttribute('src', './assets/drag-arrow.png')
         .setSize(50, 50)
         // .setStyle('backgroundColor', 'coral')
-        .setPosition(gameContainer.centerX, gameContainer.rect.height - 100)
+        .setPosition(Game.centerX, Game.height - 100)
         .setOrigin(.5, .5)
-        .addSnapPosition('bot', gameContainer.centerX, ingredientsDraggerBottom)
-        .addSnapPosition('top', gameContainer.centerX, ingredientsDraggerTop)
+        .addSnapPosition('bot', Game.centerX, ingredientsDraggerBottom)
+        .addSnapPosition('top', Game.centerX, ingredientsDraggerTop)
         .setHomeId('bot')
         .setSnapDistance(10)
         .setTransitionSpeed(.5)
-        .setHomeChangeDistance(gameContainer.rect.height / 2)
+        .setHomeChangeDistance(Game.height / 2)
         .setXAxisLock(true)
         
     uiObjects.ingredientsDragger = ingredientsDragger;
@@ -98,7 +101,7 @@ function initializeUI() {
         
         const targetId = object.getHomeId() === 'bot' ? 'top' : 'bot';
         const percent = object.percentTo(targetId);
-        const length = (gameContainer.rect.height - 100);
+        const length = (Game.height - 100);
         const y = length * (targetId === 'top' ? 1 - percent : percent);
 
         // move ingredient container (and cutting board) with the dragger
@@ -150,7 +153,7 @@ function initializeUI() {
     const width = 100;
     const height = 100;
     const startX = width / 2;
-    const endX = gameContainer.rect.width - width / 2;
+    const endX = Game.width - width / 2;
 
 
     // uses ingredientData
@@ -182,7 +185,7 @@ function initializeUI() {
         ingredientsArray.forEach(([id, {draggableGameObject}], i) => {
             const position = new Vector2(
                 (ingredientsArray.length > 1 ? (i / (ingredientsArray.length - 1)) : 0) * (endX - startX) + width / 2, 
-                gameContainer.rect.height - height / 2
+                Game.height - height / 2
             );
 
             draggableGameObject
