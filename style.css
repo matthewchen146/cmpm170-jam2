@@ -31,9 +31,14 @@ main {
     overflow: hidden;
 
     pointer-events: none;
+
+    font-family: "Garamond", serif;
+    font-size: 16px;
+
+    background-image: url('./assets/background.png');
 }
 
-/* makes the */
+/* game and ui container */
 #game-object-container,
 #ui-container {
     position: absolute;
@@ -48,16 +53,24 @@ main {
     pointer-events: auto;
 }
 
+
+/* stats */
+
 #stats {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
 }
 
-#stats > div {
-    width: 100px;
-    height: 50px;
-    background-color: lightcoral;
+#currency-container {
     text-align: center;
+    color: white;
+    width: 200px;
+    height: 100px;
+    background-image: url('./assets/sign-board.png');
+}
+
+#currency {
+    font-size: 30px;
 }
 
 /* contains the ingredients */
@@ -84,11 +97,18 @@ main {
 /* styling for recipe book pages */
 
 .recipe-book-page {
-    font-size: larger;
+    font-size: 20px;
+    font-family: "Lucida Handwriting", cursive;
 
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.recipe-book-page h2 {
+    font-family: "Garamond", serif;
+    text-decoration: black underline;
+    text-underline-offset: 15px;
 }
 
 
@@ -104,14 +124,18 @@ main {
     display: grid;
     grid-template-columns: 8fr 2fr;
     column-gap: 5px;
-    background-color: cornsilk;
+    /* background-color: cornsilk; */
     margin-bottom: 6px;
-    width: 320px;
+    width: 340px;
+
+    border: dotted cornsilk 5px;
+    border-radius: 20px;
+    padding: 10px;
 }
 
-.recipe-container .info-container {
+/* .recipe-container .info-container {
     
-}
+} */
 
 .recipe-container .label-container {
     display: flex;
@@ -142,13 +166,15 @@ main {
     height: 30px;
 }
 
+/* indicator showing how many of ingredient is needed */
 .recipe-container .ingredient-container .ingredient-amt {
     position: absolute;
+    font-size: 16px;
     width: 20px;
     height: 20px;
     right: -5px;
     bottom: -5px;
-    background-color: coral;
+    background-color: brown;
     border-radius: 10px;
     color: white;
 }
