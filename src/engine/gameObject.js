@@ -724,7 +724,7 @@ class ButtonGameObject extends GameObject {
         this.setOrigin(.5, .5);
         this.setSize(50, 30);
         this.setText('button');
-        this.setBackgroundColor('lightgray');
+        // this.setBackgroundColor('lightgray');
 
         this.clickCallback;
 
@@ -737,16 +737,22 @@ class ButtonGameObject extends GameObject {
         this.isActive = false;
         this.isHover = false;
 
+        this.setStyle('backgroundRepeat', 'no-repeat');
+        this.setStyle('backgroundSize', '100% 100%');
+
         this.defaultStyle = {
-            backgroundColor: 'lightgray'
+            // backgroundColor: 'lightgray'
+            backgroundImage: 'url("./assets/button-wide.png")'
         };
 
         this.hoverStyle = {
-            backgroundColor: 'linen'
+            // backgroundColor: 'linen'
+            backgroundImage: 'url("./assets/button-wide-hover.png")'
         };
 
         this.activeStyle = {
-            backgroundColor: 'white'
+            // backgroundColor: 'white'
+            backgroundImage: 'url("./assets/button-wide-active.png")'
         };
 
         const handleOver = (e) => {
