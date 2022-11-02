@@ -7,7 +7,7 @@ const gameContainer = {
     element: GameObject.defaultContainer,
     rect: GameObject.defaultContainer.getBoundingClientRect()
 }
-gameContainer.centerX = gameContainer.rect.width / 2;
+Game.centerX = gameContainer.rect.width / 2;
 gameContainer.centerY = gameContainer.rect.height / 2;
 
 const openBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5804");
@@ -22,9 +22,8 @@ async function load() {
 
 }
 
+let calendar;
 let pot;
-let currencyLabel;
-let currency = 0;
 let inventory;
 let catChef;
 let uiObjects;
@@ -59,18 +58,6 @@ function addIngredient(ingredient) {
 
         // increase the ingredient level
         ingredient.levelUp();
-
-        audio1.play;
-        
-
-        // add check cost functionality here
-        // to check if there is enough catnip to purchase
-        if (true) {
-            // increase the ingredient upgrade cost
-            ingredient.setCost(ingredient.cost * 2);
-
-            // decrement currency here
-        }
 
     });
 
@@ -137,16 +124,10 @@ function addRecipe(recipe) {
 }
 
 
-// add an event listener to the event emitter, that is called when the event is triggered
-eventEmitter.on('seasonCycle', () => { console.log('seasonCycle has triggerd!!') });
-
-
-// somewhere else with access to eventEmitter can trigger the event when necessary
-eventEmitter.trigger('seasonCycle');
-
 // use this function to initialize anything
 function preUpdate() {
 
+    calendar = new Calendar({month: 3});
 
     uiObjects = initializeUI();
 
@@ -154,23 +135,30 @@ function preUpdate() {
     possibleIngredients['apple'] = new IngredientData('apple', {
         name: 'Apple', 
         season: 'spring',
+        seasonBuff: [.5, 2, 1.5, 1], // winter spring summer fall
         img: './assets/apple.png'
     });
     possibleIngredients['pumpkin'] = new IngredientData('pumpkin', {
         name: 'Pumpkin', 
         season: 'fall',
+        seasonBuff: [1.5, 1, .5, 2],
         img: './assets/pumpkin.png'
     });
     possibleIngredients['corn'] = new IngredientData('corn', {
         name: 'Corn', 
         season: 'summer',
+        seasonBuff: [1, .5, 2, 1.5],
         img: './assets/corn.png'
     });
     possibleIngredients['berries'] = new IngredientData('berries', {
         name: 'Berries', 
         season: 'winter',
+        seasonBuff: [2, 1.5, 1, .5],
         img: './assets/berries.png'
     });
+
+    // store ingredient map statically to IngredientData
+    IngredientData.possibleIngredients = possibleIngredients;
 
     // adds the ingredients
     Object.entries(possibleIngredients).forEach(([id, ingredient]) => {
@@ -197,16 +185,57 @@ function preUpdate() {
     
     
     
-    inventory = new InventoryData(getIngredient('apple'));
-    catChef = new ChefData(getRecipe('applejuice'));
+    // inventory = new InventoryData(getIngredient('apple'));
+    catChef = new ChefData({
+        img: './assets/cat-head.png',
+        costFunction: (level) => {
+            return Math.pow(10, level);
+        }
+    });
+
     catChef.setRecipe(getRecipe('applejuice'), inventory);
-    potion = new PotionData();
+
+    // detect a season change, and modify the current season
+    calendar.events.on('seasonchange', ({season}) => {
+        IngredientData.season = season;
+        // console.log('season changed', calendar.getSeasonName(season));
+    });
+
+    // detect a month change
+    calendar.events.on('monthchange', ({month, season}) => {
+        
+        // console.log('month changed', calendar.getMonthName(month));
+    });
+
+    potion = new PotionData({
+        img: './assets/potion.png',
+        costFunction: (level) => {
+            return Math.pow(10, level);
+        }
+    });
+
+    catChef.setPotion(potion);
+
+    // add cat and potion upgrade
+    {
+        const {upgradeButton} = uiObjects.upgradePageData.addUpgrade(catChef);
+        upgradeButton.onClick(() => {
+            catChef.levelUp();
+        })
+    }
+    
+    {
+        const {upgradeButton} = uiObjects.upgradePageData.addUpgrade(potion);
+        upgradeButton.onClick(() => {
+            potion.levelUp();
+        })
+    }
+    
+
+    // catshier = new CatnipCollector();
 
 
-    catshier = new CatnipCollector();
-
-
-    currencyLabel = new GameObject({element: document.querySelector('#currency')});
+    // uiObjects.currencyLabel = new GameObject({element: document.querySelector('#currency')});
 
 
     // create the witch cat, stirring the pot
@@ -215,7 +244,7 @@ function preUpdate() {
     })
         .setSize(491, 609)
         .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
-        .setPosition(gameContainer.centerX, Game.height)
+        .setPosition(Game.centerX, Game.height)
     
 }
 
@@ -225,19 +254,19 @@ function preUpdate() {
 // time is the total time the game has been running, in ms
 function update(delta, time) {
 
-    // to test this works, here is a line that logs the delta and game time
-    // console.log(delta, (time / 1000).toFixed(1))
+    // cat cooks and returns the currency earned, can take a recipe argument and season argument
+    // if no season argument, the season is determined by the season set in STATIC IngredientData.season
+    const rate = catChef.cook(); // per second
 
-       
-    // anything involving something per second, place in here for now
-  
-    
-    currency += catChef.cookStuff(catshier,potion,inventory)*(delta/1000);
+    uiObjects.currencyRateLabel.textContent = `${rate} cn/s`;
+
+    catChef.currency += rate * delta * .001;
 
     // set currency text in currency label
-    currencyLabel.setText(`${currency.toFixed(2)} catnip`);
+    uiObjects.currencyLabel.textContent = `${catChef.currency.toFixed(2)} catnip`;
 
-
+    // update the calendar
+    calendar.update(delta);
 }
 
 
