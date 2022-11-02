@@ -234,7 +234,7 @@ class RecipeData {
 
         this.reqamount = 11;
 
-        this.isKnown = false;
+        this.isKnown = options.isKnown || false;
     }
 
     getIngredientIds() {

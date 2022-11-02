@@ -51,12 +51,12 @@ function initializeRecipePage(recipeBook) {
 
         // add the ingredients required to the ingredients container, with the amt needed
         Object.entries(ingredients).forEach(([ingredient, amt]) => {
-
+            
             const ingredientContainer = document.createElement('div');
             ingredientContainer.classList.toggle('ingredient-container', true);
             
             const ingredientImg = document.createElement('img');
-            ingredientImg.setAttribute('src', ingredientMap[ingredient]?.img || './assets/apple.png');
+            ingredientImg.setAttribute('src', possibleIngredients[ingredient]?.img || './assets/apple.png');
             ingredientImg.classList.toggle('ingredient-img', true);
             ingredientContainer.appendChild(ingredientImg);
 

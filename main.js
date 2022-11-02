@@ -94,10 +94,10 @@ function getIngredient(id) {
 }
 
 
-let availableRecipes = {};
+let possibleRecipes = {};
 
 function getRecipe(id) {
-    return availableRecipes[id];
+    return possibleRecipes[id];
 }
 
 // handles adding a recipe to the GAME
@@ -125,6 +125,10 @@ function addRecipe(recipe) {
     })
 }
 
+function createRecipe(id, ingredients, options) {
+    possibleRecipes[id] = new RecipeData(id, ingredients, options);
+    return possibleRecipes[id];
+}
 
 // use this function to initialize anything
 function preUpdate() {
@@ -184,20 +188,17 @@ function preUpdate() {
 
     })
     
+    // read raw recipes from recipes.js and create recipes
+    Object.entries(rawRecipes).forEach(([id, {ingredients, name, img, isKnown}]) => {
+        createRecipe(id, ingredients, { name, img, isKnown });
+    })
 
-    // create recipes
-    availableRecipes['applejuice'] = new RecipeData('applejuice', { apple: 1 }, { 
-        name: 'Apple Juice',
-        img: 'https://www.martinellis.com/wp-content/uploads/2017/03/bottle-apple-juice-glass-with-no-label-10oz_750x591-240x0-c-default.png'
-    });
-    availableRecipes['pumpkinpie'] = new RecipeData('pumpkinpie', { pumpkin: 1 }, { 
-        name: 'Pumpkin Pie',
-        img: './assets/recipes/pumpkin-pie.png'
-    });
-
-    Object.entries(availableRecipes).forEach(([id, recipe]) => {
+    // add these intial recipes to the game
+    Object.entries(possibleRecipes).forEach(([id, recipe]) => {
         
-        addRecipe(recipe);
+        if (recipe.isKnown) {
+            addRecipe(recipe);
+        }
 
     })
     
