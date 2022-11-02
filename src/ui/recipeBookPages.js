@@ -23,25 +23,13 @@ function initializeRecipePage(recipeBook) {
     centerContainer.classList.toggle('recipes', true);
     page.appendChild(centerContainer);
 
-    // create a grid
-    // const grid = document.createElement('div');
-    // centerContainer.appendChild(grid);
-    // grid.style.display = 'grid';
-    // grid.style.gridTemplateColumns = '1fr 1fr 1fr';
-    // grid.style.rowGap = '5px';
-
     const addRecipe = ({name, id, ingredients, img}) => {
         const recipeContainer = document.createElement('div');
         recipeContainer.classList.toggle('recipe-container', true);
-        // recipeContainer.style.display = 'grid';
-        // recipeContainer.style.gridTemplateColumns = '8fr 2fr';
-        // recipeContainer.style.columnGap = '5px';
 
         const infoContainer = document.createElement('div');
         infoContainer.classList.toggle('info-container', true);
         recipeContainer.appendChild(infoContainer);
-        // infoContainer.style.display = 'flex';
-        // infoContainer.style.width
 
         const labelContainer = document.createElement('div');
         labelContainer.classList.toggle('label-container', true);
@@ -58,7 +46,7 @@ function initializeRecipePage(recipeBook) {
 
         const ingredientsContainer = document.createElement('div');
         ingredientsContainer.classList.toggle('ingredients-container', true);
-        infoContainer.appendChild(ingredientsContainer);
+        label.appendChild(ingredientsContainer);
 
         // add the ingredients required to the ingredients container, with the amt needed
         Object.entries(ingredients).forEach(([ingredient, amt]) => {
@@ -89,7 +77,7 @@ function initializeRecipePage(recipeBook) {
             positionMode: GameObject.PositionModes.NONE
         })
             .setClass('select-button', true)
-            .setSize(70,50)
+            .setSize(100,50)
             .setText('Cook')
 
         centerContainer.appendChild(recipeContainer);
@@ -172,42 +160,7 @@ function initializeUpgradePage(recipeBook) {
     grid.appendChild(buttonTitle);
 
     const upgradePageData = {};
-
-    // the grid:
-    // ITEMS (their icon only) - LEVEL - UPGRADE BUTTON (with cost)
-    // ex: CAT - LVL 99 - [250 catnip]
-    // currently contains example data
-    // const itemData = [
-    //     {
-    //         id: 'cat',
-    //         icon: './assets/cat-head.png',
-    //     },
-    //     {
-    //         id: 'apple',
-    //         icon: './assets/apple.png',
-    //     },
-    //     {
-    //         id: 'pumpkin',
-    //         icon: './assets/pumpkin.png',
-    //     },
-    //     {
-    //         id: 'corn',
-    //         icon: './assets/corn.png',
-    //     },
-    //     {
-    //         id: 'berries',
-    //         icon: './assets/berries.png',
-    //     },
-    //     {
-    //         id: 'potion',
-    //         icon: './assets/potion.png',
-    //         cost: 100
-    //     },
-    // ]
-    // itemData.forEach(({id, icon, level, cost}) => {
-        
-    // });
-
+    
 
     // adds object (which is usually an ingredient) to the upgrades page to be upgraded
     function addUpgrade(object) {
