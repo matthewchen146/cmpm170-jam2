@@ -187,8 +187,8 @@ function preUpdate() {
     })
     
     // read raw recipes from recipes.js and create recipes
-    Object.entries(rawRecipes).forEach(([id, {ingredients, name, img, isKnown}]) => {
-        const recipe = createRecipe(id, ingredients, { name, img, isKnown });
+    Object.entries(rawRecipes).forEach(([id, {ingredients, name, img, isKnown, value}]) => {
+        const recipe = createRecipe(id, ingredients, { name, img, isKnown, value });
         if (recipe.isKnown) {
             addRecipe(recipe);
         }
