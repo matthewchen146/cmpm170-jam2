@@ -9,6 +9,8 @@ const flipPage = new Audio("https://www.fesliyanstudios.com/play-mp3/5477");
 
 const audio1 = new Audio("assets/sounds/512131__beezlefm__coins-small-sound.wav")
 
+const bgm = new Audio('./assets/bgm.wav');
+
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
 async function load() {
@@ -276,6 +278,9 @@ function preUpdate() {
         .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
         .setPosition(Game.centerX, Game.height)
     
+
+    bgm.loop = true;
+    bgm.play();
 }
 
 
@@ -293,7 +298,7 @@ function update(delta, time) {
     catChef.currency += rate * delta * .001;
 
     // set currency text in currency label
-    uiObjects.currencyLabel.textContent = `${catChef.currency.toFixed(2)} catnip`;
+    uiObjects.currencyLabel.textContent = `${catChef.currency.toFixed(0)} catnip`;
 
     // update the calendar
     calendar.update(delta);
