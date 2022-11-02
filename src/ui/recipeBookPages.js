@@ -26,6 +26,7 @@ function initializeRecipePage(recipeBook) {
     const addRecipe = ({name, id, ingredients, img}) => {
         const recipeContainer = document.createElement('div');
         recipeContainer.classList.toggle('recipe-container', true);
+        recipeContainer.classList.toggle('dotted-border', true);
 
         const infoContainer = document.createElement('div');
         infoContainer.classList.toggle('info-container', true);
@@ -136,6 +137,8 @@ function initializeUpgradePage(recipeBook) {
 
     const centerContainer = document.createElement('div');
     centerContainer.style.textAlign = 'center';
+    centerContainer.classList.toggle('dotted-border', true);
+    centerContainer.style.padding = '10px';
     page.appendChild(centerContainer);
 
     // create a grid
@@ -177,6 +180,7 @@ function initializeUpgradePage(recipeBook) {
         
 
         const label = document.createElement('div');
+        label.classList.toggle('level-label', true);
         label.textContent = `${level || 1}`;
         grid.appendChild(label);
 
@@ -184,8 +188,9 @@ function initializeUpgradePage(recipeBook) {
             container: grid,
             positionMode: GameObject.PositionModes.NONE,
         })
-            .setSize(80, 50)
+            .setSize(100, 50)
             .setText(`${cost || 1} catnip`)
+            .setClass('upgrade-button', true)
         
         // store the upgrade button in the object
         object.upgradeButton = button;
@@ -201,6 +206,16 @@ function initializeUpgradePage(recipeBook) {
     return upgradePageData;
 }
 
+function initializeCreditsPage(recipeBook) {
+    // create credits page
+    const page = recipeBook.createPage()
+        .setId('credits')
+
+    const title = createTitle('Credits');
+
+    page.appendChild(title);
+}
+
 // move upgrade buttons into ui objects
 // possible make ui objects global
 function fillRecipeBook(recipeBook, uiObjects) {
@@ -213,6 +228,5 @@ function fillRecipeBook(recipeBook, uiObjects) {
     const upgradePageData = initializeUpgradePage(recipeBook);
     uiObjects.upgradePageData = upgradePageData;
 
-    recipeBook.createPage()
-        .setText('awards')
+    initializeCreditsPage(recipeBook);
 }
