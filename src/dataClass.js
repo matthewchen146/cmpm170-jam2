@@ -148,6 +148,10 @@ class UpgradeableData {
         return this.costFunction(level);
     }
 
+    getCost() {
+        return this.cost;
+    }
+
     updateCost(level = this.level) {
         this.cost = this.calculateCost(level);
         if (this.upgradeButton) {
@@ -191,27 +195,16 @@ class IngredientData extends UpgradeableData {
         
         this.yield = 1;
         
-        this.baseValue = options.baseValue || 10;
+        this.baseMultiplier = options.baseMultiplier || 1;
     }
 
-    getName(){
+    getName() {
         return this.name;
-    }
-    getPrimeSeason(){
-        return this.season;
-    }
-    crop(passedbuff){
-        return this.yield*passedbuff;
-    }
-
-    yieldUp(){
-        this.yield +=1;
-
     }
 
     getValue(season = IngredientData.season || this.season) {
         const currentSeason = season;
-        return this.level * this.seasonBuff[currentSeason] * this.baseValue;
+        return this.level * this.seasonBuff[currentSeason] * this.baseMultiplier;
     }
 }
 
@@ -275,11 +268,11 @@ class PotionData extends UpgradeableData {
     constructor(options = {}) {
         super(options);
 
-        this.baseValue = options.baseValue || 10;
+        this.baseMultiplier = options.baseMultiplier || 10;
     }
 
     getMultiplier() {
-        return this.level * this.baseValue;
+        return this.level * this.baseMultiplier;
     }
 }
 
@@ -296,10 +289,8 @@ constructor(options = {}){
 
     this.currency = 0;
 
-    //the cat level, how many of a dish is made at a time.
-    this.productionMult = 1;
-    this.recmean =0;
-    
+    // the cat level, how many of a dish is made at a time.
+    this.productionMultiplier = options.productionMultiplier || 1;
 }
     //set current recipe and tell the inventoryData what is 
     //needed
@@ -316,7 +307,7 @@ constructor(options = {}){
 
     // this will essentially return how many recipes can be made in a second based on the level
     getMultiplier() {
-        return this.level * 1;
+        return this.level * this.productionMultiplier;
     }
 
     getRate(recipe = this.currentRecipe, season) {

@@ -16,13 +16,14 @@ async function load() {
 }
 
 let calendar;
-let pot;
-let inventory;
+
 let catChef;
 let uiObjects;
+
 let witchCat;
-let apples;
+
 let potion;
+
 const eventEmitter = new EventEmitter();
 
 let selectedRecipes = [];
@@ -49,8 +50,13 @@ function addIngredient(ingredient) {
     // add upgrade button functionality
     upgradeButton.onClick(() => {
 
-        // increase the ingredient level
-        ingredient.levelUp();
+        if (catChef.currency > ingredient.getCost()) {
+
+            catChef.currency -= ingredient.getCost();
+
+            // increase the ingredient level
+            ingredient.levelUp();
+        }
 
     });
 
@@ -103,7 +109,7 @@ function addRecipe(recipe) {
 
         openBook.play();
 
-        catChef.setRecipe(recipe, inventory);
+        catChef.setRecipe(recipe);
 
         if (selectedRecipe) {
             // reset previous recipe button's state
@@ -129,25 +135,40 @@ function preUpdate() {
         name: 'Apple', 
         season: 'spring',
         seasonBuff: [.5, 2, 1.5, 1], // winter spring summer fall
-        img: './assets/apple.png'
+        img: './assets/apple.png',
+
+        // cost function for ingredients
+        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+
+        // base value / multiplier for the ingredient
+        baseMultiplier: 1
     });
     possibleIngredients['pumpkin'] = new IngredientData('pumpkin', {
         name: 'Pumpkin', 
         season: 'fall',
         seasonBuff: [1.5, 1, .5, 2],
-        img: './assets/pumpkin.png'
+        img: './assets/pumpkin.png',
+
+        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        baseMultiplier: 1
     });
     possibleIngredients['corn'] = new IngredientData('corn', {
         name: 'Corn', 
         season: 'summer',
         seasonBuff: [1, .5, 2, 1.5],
-        img: './assets/corn.png'
+        img: './assets/corn.png',
+
+        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        baseMultiplier: 1
     });
     possibleIngredients['berries'] = new IngredientData('berries', {
         name: 'Berries', 
         season: 'winter',
         seasonBuff: [2, 1.5, 1, .5],
-        img: './assets/berries.png'
+        img: './assets/berries.png',
+
+        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        baseMultiplier: 1
     });
 
     // store ingredient map statically to IngredientData
@@ -177,16 +198,59 @@ function preUpdate() {
     })
     
     
-    
-    // inventory = new InventoryData(getIngredient('apple'));
+    // create the cat chef
     catChef = new ChefData({
         img: './assets/cat-head.png',
         costFunction: (level) => {
             return Math.pow(10, level);
-        }
+        },
+
+        // modify the multiplier of the catchef
+        productionMultiplier: 1
     });
 
-    catChef.setRecipe(getRecipe('applejuice'), inventory);
+    catChef.setRecipe(getRecipe('applejuice'));
+
+
+    potion = new PotionData({
+        img: './assets/potion.png',
+        costFunction: (level) => {
+            return Math.pow(10, level);
+        },
+
+        // set the base multiplier of the potion
+        baseMultiplier: 10
+    });
+
+    catChef.setPotion(potion);
+
+    // add cat and potion upgrade
+    {
+        const {upgradeButton} = uiObjects.upgradePageData.addUpgrade(catChef);
+        upgradeButton.onClick(() => {
+
+            if (catChef.currency > catChef.getCost()) {
+
+                catChef.currency -= catChef.getCost();
+                catChef.levelUp();
+
+            }
+            
+        })
+    }
+    
+    {
+        const {upgradeButton} = uiObjects.upgradePageData.addUpgrade(potion);
+        upgradeButton.onClick(() => {
+            if (catChef.currency > potion.getCost()) {
+
+                catChef.currency -= potion.getCost();
+                potion.levelUp();
+
+            }
+        })
+    }
+    
 
     // detect a season change, and modify the current season
     calendar.events.on('seasonchange', ({season}) => {
@@ -196,39 +260,8 @@ function preUpdate() {
 
     // detect a month change
     calendar.events.on('monthchange', ({month, season}) => {
-        
         // console.log('month changed', calendar.getMonthName(month));
     });
-
-    potion = new PotionData({
-        img: './assets/potion.png',
-        costFunction: (level) => {
-            return Math.pow(10, level);
-        }
-    });
-
-    catChef.setPotion(potion);
-
-    // add cat and potion upgrade
-    {
-        const {upgradeButton} = uiObjects.upgradePageData.addUpgrade(catChef);
-        upgradeButton.onClick(() => {
-            catChef.levelUp();
-        })
-    }
-    
-    {
-        const {upgradeButton} = uiObjects.upgradePageData.addUpgrade(potion);
-        upgradeButton.onClick(() => {
-            potion.levelUp();
-        })
-    }
-    
-
-    // catshier = new CatnipCollector();
-
-
-    // uiObjects.currencyLabel = new GameObject({element: document.querySelector('#currency')});
 
 
     // create the witch cat, stirring the pot
