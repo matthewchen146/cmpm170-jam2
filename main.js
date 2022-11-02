@@ -3,13 +3,14 @@
 GameObject.defaultContainer = document.querySelector('#game-object-container');
 
 
-const openBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5804");
-const closeBook = new Audio("https://www.fesliyanstudios.com/play-mp3/5765")
-const flipPage = new Audio("https://www.fesliyanstudios.com/play-mp3/5477");
+const openBook = new Sound("https://www.fesliyanstudios.com/play-mp3/5804");
+const closeBook = new Sound("https://www.fesliyanstudios.com/play-mp3/5765")
+const flipPage = new Sound("https://www.fesliyanstudios.com/play-mp3/5477");
 
-const audio1 = new Audio("assets/sounds/512131__beezlefm__coins-small-sound.wav")
+const audio1 = new Sound("assets/sounds/512131__beezlefm__coins-small-sound.wav")
 
-const bgm = new Audio('./assets/bgm.wav');
+// const bgm = new Audio();
+let bgm;
 
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
@@ -278,9 +279,22 @@ function preUpdate() {
         .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
         .setPosition(Game.centerX, Game.height)
     
+    bgm = new Sound('./assets/bgm.wav');
+    
+    bgm.events.once('canplaythrough', () => {    
+        bgm.loop = true;
+        bgm.volume = .2;
+        bgm.play();
+        // console.log('canplaythrough starting bgm')
+    })
 
-    bgm.loop = true;
-    bgm.play();
+    window.addEventListener('click', () => {
+        if (!bgm.playing) {
+            bgm.play();
+            console.log('click starting bgm');
+        }
+    }, { once: true })
+
 }
 
 
@@ -288,7 +302,7 @@ function preUpdate() {
 // delta is the time since the last frame, in ms
 // time is the total time the game has been running, in ms
 function update(delta, time) {
-
+    
     // cat cooks and returns the currency earned, can take a recipe argument and season argument
     // if no season argument, the season is determined by the season set in STATIC IngredientData.season
     const rate = catChef.cook(); // per second
