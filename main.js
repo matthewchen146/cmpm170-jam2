@@ -190,16 +190,10 @@ function preUpdate() {
     
     // read raw recipes from recipes.js and create recipes
     Object.entries(rawRecipes).forEach(([id, {ingredients, name, img, isKnown}]) => {
-        createRecipe(id, ingredients, { name, img, isKnown });
-    })
-
-    // add these intial recipes to the game
-    Object.entries(possibleRecipes).forEach(([id, recipe]) => {
-        
+        const recipe = createRecipe(id, ingredients, { name, img, isKnown });
         if (recipe.isKnown) {
             addRecipe(recipe);
         }
-
     })
     
     
