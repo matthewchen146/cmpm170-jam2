@@ -21,6 +21,7 @@ async function load() {
 }
 
 let calendar;
+let seasonSprite;
 
 let catChef;
 let uiObjects;
@@ -135,6 +136,18 @@ function createRecipe(id, ingredients, options) {
 function preUpdate() {
 
     calendar = new Calendar({month: 3});
+    seasonSprite = new SpriteGameObject({
+        src: './assets/season-sheet.png',
+        spriteSize: {x: 100, y: 100},
+        imageSize: {x: 400, y: 100}
+    })
+        .setSize(150,150)
+        .setPosition(5,5)
+        .setFrame(calendar.getSeason())
+
+    calendar.events.on('seasonchange', ({season}) => {
+        seasonSprite.setFrame(season);
+    })
 
     uiObjects = initializeUI();
 

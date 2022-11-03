@@ -844,3 +844,51 @@ class ImageGameObject extends GameObject {
         this.setAttribute('src', options.src);
     }
 }
+
+
+// simple sprite sheet handler
+// assumes each sprite has the same dimensions
+// for objects that have multiple sprites
+class SpriteGameObject extends GameObject {
+    constructor(options = {}) {
+        super(options);
+            
+        this.spriteSize = new Vector2(options.spriteSize);
+        this.imageSize = new Vector2(options.imageSize);
+        
+        this.setFrame(options.frame || 0);
+        this.setSize(this.spriteSize);
+
+        if (!options.src) {
+            console.error('sprite game object needs a src url!')
+        }
+
+        this.setStyle('backgroundImage', `url(${options.src})`);
+
+        if (this.imageSize) {
+            this.setStyle('backgroundSize', `${this.imageSize.x / this.spriteSize.x * 100}% ${this.imageSize.y / this.spriteSize.y * 100}%`);
+        } else {
+            this.setStyle('backgroundSize', 'cover');
+        }
+        
+    }
+
+    setFrame(frame) {
+        this._frame = frame;
+        const xOffset = -this._frame * this.spriteSize.x * (this._size.x / this.spriteSize.x);
+        this.setStyle('backgroundPosition', `${xOffset}px ${0}px`);
+        return this;
+    }
+
+    getFrame() {
+        return this._frame;
+    }
+
+    setSize(x, y) {
+        super.setSize(x, y);
+        if (this.spriteSize) {
+            this.setFrame(this._frame);
+        }
+        return this;
+    }
+}
