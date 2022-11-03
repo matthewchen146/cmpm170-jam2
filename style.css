@@ -17,6 +17,10 @@ main {
     background-color: rgb(17, 16, 16);
 }
 
+#title-container {
+    user-select: none;
+}
+
 #title-container > h1 {
     color: linen;
     font-size: 50px;
@@ -24,6 +28,7 @@ main {
 
 #settings-container {
     color: linen;
+    user-select: none;
 }
 
 #settings-container h2 {
@@ -62,12 +67,14 @@ main {
 
 /* game and ui container */
 #game-object-container,
-#ui-container {
+#ui-container,
+#overlay-container {
     position: absolute;
     height: 100%;
     width: 100%;
 
-    pointer-events: none;
+    user-select: none;
+    /* pointer-events: none; */
 }
 
 #game-object-container *,
