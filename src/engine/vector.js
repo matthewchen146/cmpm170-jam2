@@ -148,3 +148,38 @@ class Vector2 {
 function vec2(x, y) {
     return new Vector2(x, y);
 }
+
+
+/**
+ * @param {Vector2} start
+ * @param {Vector2} end
+ */
+class LinearCurve {
+    constructor(start, end) {
+        this.start = new Vector2(start);
+        this.end = new Vector2(end);
+    }
+
+    at(t) {
+        return this.start.lerpv(this.end, t);
+    }
+}
+
+/**
+ * @param {Vector2} start
+ * @param {Vector2} control
+ * @param {Vector2} end
+ */
+class BilinearCurve {
+    constructor(start, control, end) {
+        this.start = new Vector2(start);
+        this.control = new Vector2(control);
+        this.end = new Vector2(end);
+    }
+
+    at(t) {
+        const a = this.start.lerpv(this.control, t);
+        const b = this.control.lerpv(this.end, t);
+        return a.lerpv(b, t);
+    }
+}
