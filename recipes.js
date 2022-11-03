@@ -69,6 +69,6 @@ const rawRecipes = {
         },
         value: 3,
         name: 'Cranberry Pumpkin Pie',
-        img: './assets/recipes/cranberry-pumpkin-soup.png',
+        img: './assets/recipes/cranberry-pumpkin-pie.png',
     },
 }
