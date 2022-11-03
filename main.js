@@ -6,8 +6,6 @@ const levelUpSound = new Sound('./assets/sounds/levelup.wav');
 const potBubblingSound = new Sound('./assets/sounds/potbubbling.wav', {loop: true, volume: .2});
 const stirringSound = new Sound('./assets/sounds/stirring.wav', {loop: true, volume: .2});
 
-// const audio1 = new Sound("assets/sounds/512131__beezlefm__coins-small-sound.wav")
-
 const bgm = new Sound('./assets/bgm.wav', {loop: true, volume: .2});
 
 // use this function to load things like assets
@@ -149,8 +147,11 @@ function preUpdate() {
         .setPosition(5,5)
         .setFrame(calendar.getSeason())
 
+    const seasonSound = new Sound('./assets/sounds/bellam.wav', {volume: .5});
+
     calendar.events.on('seasonchange', ({season}) => {
         seasonSprite.setFrame(season);
+        seasonSound.play();
     })
 
     uiObjects = initializeUI();
@@ -382,20 +383,6 @@ function preUpdate() {
             }
         }
     }, { once: false })
-    
-    window.addEventListener('keydown', (event) => {
-        if (event.key == 'm') {
-            detect++;
-            console.log(detect);
-            if (detect % 2 == 0) {
-                Sound.setVolume(0);
-            } else {
-                Sound.setVolume(.5);
-            }
-        }
-    }, { once: false })
-
-
 
 }
 
