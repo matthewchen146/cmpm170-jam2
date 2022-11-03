@@ -14,10 +14,16 @@ main {
     align-items: center;
 
     font-family: "Garamond", serif;
+    background-color: rgb(17, 16, 16);
 }
 
 #title-container > h1 {
+    color: linen;
     font-size: 50px;
+}
+
+#settings-container {
+    color: linen;
 }
 
 #settings-container h2 {
@@ -51,7 +57,7 @@ main {
     font-family: "Garamond", serif;
     font-size: 16px;
 
-    background-image: url('./assets/background.png');
+    background-image: url('./assets/sky.png');
 }
 
 /* game and ui container */

@@ -214,6 +214,13 @@ function initializeCreditsPage(recipeBook) {
     const title = createTitle('Credits');
 
     page.appendChild(title);
+
+    const centerContainer = document.createElement('div');
+    // centerContainer.style.textAlign = 'center';
+    centerContainer.id = 'credits';
+    centerContainer.classList.toggle('dotted-border', true);
+    // centerContainer.style.padding = '10px';
+    page.appendChild(centerContainer);
 }
 
 // move upgrade buttons into ui objects

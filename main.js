@@ -143,8 +143,9 @@ function preUpdate() {
         spriteSize: {x: 100, y: 100},
         imageSize: {x: 400, y: 100}
     })
-        .setSize(150,150)
-        .setPosition(5,5)
+        .setSize(150, 150)
+        .setPosition(100, 245)
+        .setOrigin(.5, .5)
         .setFrame(calendar.getSeason())
 
     const seasonSound = new Sound('./assets/sounds/bellam.wav', {volume: .5});
@@ -153,6 +154,13 @@ function preUpdate() {
         seasonSprite.setFrame(season);
         seasonSound.play();
     })
+
+
+    const wall = new GameObject()
+        // .setStyle('backgroundImage', 'radial-gradient(circle at center, rgba(0,0,0,.5) 0, black 100%), url("./assets/background.png")')
+        .setStyle('backgroundImage', 'url("./assets/background.png")')
+        .setSize(500,700)
+
 
     uiObjects = initializeUI();
 
