@@ -11,6 +11,7 @@ const bgm = new Sound('./assets/bgm.wav', {loop: true, volume: .2});
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
 async function load() {
+    // wait for main sounds to load
     await Promise.all([
         new Promise((resolve) => {
             bgm.events.on('canplaythrough', resolve);
@@ -33,8 +34,6 @@ let uiObjects;
 let witchCat;
 
 let potion;
-
-const eventEmitter = new EventEmitter();
 
 let selectedRecipes = [];
 let possibleIngredients = {};
@@ -137,6 +136,8 @@ function createRecipe(id, ingredients, options) {
 // use this function to initialize anything
 function preUpdate() {
 
+    initializeGlobal();
+
     calendar = new Calendar({month: 3});
     seasonSprite = new SpriteGameObject({
         src: './assets/season-sheet.png',
@@ -144,10 +145,11 @@ function preUpdate() {
         imageSize: {x: 400, y: 100}
     })
         .setSize(150, 150)
-        .setPosition(100, 245)
+        .setPosition(95, 245)
         .setOrigin(.5, .5)
         .setFrame(calendar.getSeason())
 
+    IngredientData.season = calendar.getSeason();
     const seasonSound = new Sound('./assets/sounds/bellam.wav', {volume: .5});
 
     calendar.events.on('seasonchange', ({season}) => {
@@ -159,7 +161,7 @@ function preUpdate() {
     const wall = new GameObject()
         // .setStyle('backgroundImage', 'radial-gradient(circle at center, rgba(0,0,0,.5) 0, black 100%), url("./assets/background.png")')
         .setStyle('backgroundImage', 'url("./assets/background.png")')
-        .setSize(500,700)
+        .setSize(Game.width, Game.height)
 
 
     uiObjects = initializeUI();
@@ -394,6 +396,86 @@ function preUpdate() {
 
 }
 
+// creates a splash in the pot / position
+async function createSplash(position, count = 10) {
+    const source = new Vector2(position);
+    for (let i = 0; i < count; i++) {
+        const velocity = new Vector2(i - count / 2, -1).normalize().mul(Math.random() * 3 + 1);
+        velocity.y = -Math.random() * 4 - 3;
+
+        let timer = 0;
+        let duration = 1000;
+
+        const particle = new ImageGameObject({src: './assets/bubble.png'})
+            .setTransitionEnabled(false)
+            .setPosition(source)
+            .setOrigin(.5, .5)
+            .setSize(20,20)
+        
+        particle.setUpdate((delta) => {
+
+            const progress = Math.min(timer / duration, 1);
+
+            velocity.y += delta * .02;
+
+            particle.translate(velocity);
+
+            const size = (1 - progress) * 20;
+            particle.setSize(size, size);
+
+            if (progress === 1) {
+                particle.destroy();
+            }
+
+            timer += delta;
+
+        })
+    }
+}
+
+// cooking animation
+async function cookAnimation(recipe) {
+    if (!recipe) { return; }
+
+    for (const {ingredient} of recipe.getIngredients()) {
+        
+        // creates an ingredient object that flies into the pot
+        const ingredientObject = new ImageGameObject({src: ingredient.img})
+            .setTransitionEnabled(false)
+            .setPosition(ingredient.draggableGameObject.getGlobalPosition())
+            .setOrigin(.5, .5)
+        
+        let timer = 0;
+        let duration = 500;
+        const startSize = ingredient.draggableGameObject.getSize();
+        const endSize = {x: 40, y: 40};
+        const start = ingredientObject.getPosition();
+        const end = {x: Game.centerX, y: 480};
+        const control = {x: start.x + (end.x - start.x) / 2, y: 300};
+        const curve = new BilinearCurve(start, control, end);
+        ingredientObject.setUpdate((delta, time) => {
+
+            const progress = Math.min(timer / duration, 1);
+
+            const position = curve.at(progress);
+            ingredientObject.setPosition(position);
+            const size = startSize.lerpv(endSize, progress);
+            ingredientObject.setSize(size);
+
+            if (progress === 1) {
+                createSplash(ingredientObject.getPosition(), 6)
+                ingredientObject.destroy();
+            }
+
+            timer += delta;
+        })
+
+        await new Promise((resolve) => { setTimeout(resolve, 200)})
+    }
+}
+
+let cookTimer = 0;
+let cookInterval = 2000;
 
 // use this function as the main game loop
 // delta is the time since the last frame, in ms
@@ -410,6 +492,19 @@ function update(delta, time) {
 
     // set currency text in currency label
     uiObjects.currencyLabel.textContent = `${catChef.currency.toFixed(0)} catnip`;
+
+    // make cooking animation
+    if (cookTimer >= cookInterval) {
+
+        // start a cooking animation
+        cookAnimation(catChef.getRecipe());
+
+        cookTimer -= cookInterval;
+    }
+
+    if (Game.isWindowFocused) {
+        cookTimer += delta;
+    }
 
     // update the calendar
     calendar.update(delta);
