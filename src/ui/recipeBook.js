@@ -9,9 +9,9 @@ class RecipeBook extends GameObject {
 
     static init() {
         if (!this.initialized) {
-            this.openSound = new Sound('https://www.fesliyanstudios.com/play-mp3/5804', {});
-            this.closeSound = new Sound('https://www.fesliyanstudios.com/play-mp3/5765', {});
-            this.flipSound = new Sound('https://www.fesliyanstudios.com/play-mp3/5477', {});
+            this.openSound = new Sound('./assets/sounds/openBook.mp3', {});
+            this.closeSound = new Sound('./assets/sounds/closeBook.mp3', {});
+            this.flipSound = new Sound('./assets/sounds/flipPage.mp3', {});
 
             this.initialized = true;
         }
