@@ -67,7 +67,9 @@ class Timer {
         if (progress === 1) {
 
             this.events.trigger('end', this);
-            this.resolve();
+            if (this.resolve) {
+                this.resolve();
+            }
 
             this.destroy();
         }
@@ -79,6 +81,11 @@ class Timer {
         }
         return this;
     }
+
+    onUpdate(callback) {
+        this.events.on('update', callback);
+        return this;
+    } 
 
     destroy() {
         this.isDestroyed = true;
