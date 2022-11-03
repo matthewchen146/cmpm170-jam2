@@ -55,6 +55,9 @@ class Sound {
             blob = await fetch(url, {
                 method: 'GET',
                 mode: 'cors',
+                headers: {
+                    'Access-Control-Allow-Origin': '*'
+                },
             }).then((response) => { return response.blob(); });
         } catch (error) {
             console.warn('failed to fetch',src,'probably a CORS issue, which happens when testing locally');
