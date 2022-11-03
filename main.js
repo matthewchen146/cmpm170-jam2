@@ -7,6 +7,8 @@ const openBook = new Sound("https://www.fesliyanstudios.com/play-mp3/5804");
 const closeBook = new Sound("https://www.fesliyanstudios.com/play-mp3/5765")
 const flipPage = new Sound("https://www.fesliyanstudios.com/play-mp3/5477");
 
+const levelUpSound = new Sound('./assets/sounds/levelup.wav');
+
 const audio1 = new Sound("assets/sounds/512131__beezlefm__coins-small-sound.wav")
 
 // const bgm = new Audio();
@@ -58,6 +60,7 @@ function addIngredient(ingredient) {
 
             // increase the ingredient level
             ingredient.levelUp();
+            levelUpSound.play();
         }
 
     });
@@ -238,7 +241,7 @@ function preUpdate() {
 
                 catChef.currency -= catChef.getCost();
                 catChef.levelUp();
-
+                levelUpSound.play();
             }
             
         })
@@ -251,7 +254,7 @@ function preUpdate() {
 
                 catChef.currency -= potion.getCost();
                 potion.levelUp();
-
+                levelUpSound.play();
             }
         })
     }
