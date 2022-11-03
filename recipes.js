@@ -44,6 +44,15 @@ const rawRecipes = {
         name: 'Apple Pumpkin Pie',
         img: './assets/recipes/apple-pumpkin-pie.png',
     },
+    cranberryapplepie: {
+        ingredients: {
+            apple: 1,
+            berries: 1
+        },
+        value: 2,
+        name: 'Cranberry Apple Pie',
+        img: './assets/recipes/cranberry-apple-pie.png',
+    },
     pumpkincornsoup: {
         ingredients: {
             corn: 1,
