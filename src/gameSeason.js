@@ -1,4 +1,4 @@
-
+const seasonSound = new Sound('./assets/sounds/season_change.wav');
 
 class Calendar {
     constructor(options = {}) {
@@ -34,6 +34,7 @@ class Calendar {
 
         if (this.getSeason() !== lastSeason) {
             this.events.trigger('seasonchange', {month: this.month, season: this.season});
+            seasonSound.play();
         }
 
         return this;
