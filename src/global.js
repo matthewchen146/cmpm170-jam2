@@ -36,6 +36,17 @@ function initializeGlobal() {
         Game.updateRect();
     });
 
+    Game.eventEmitter = new EventEmitter();
+
+    Game.isWindowFocused = document.hasFocus();
+    window.addEventListener('focus', () => {    
+        Game.isWindowFocused = true;
+        Game.eventEmitter.trigger('focus');
+    });
+    window.addEventListener('blur', () => {
+        Game.isWindowFocused = false;
+        Game.eventEmitter.trigger('blur');
+    })
+
 }
 
-initializeGlobal();
