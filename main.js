@@ -365,22 +365,24 @@ function preUpdate() {
             
         })
 
+    var detect = 1;
     window.addEventListener('click', () => {
-        if (!bgm.playing) {
-            bgm.play();
-            console.log('click starting bgm');
-        }
-
-        if (!potBubblingSound.playing) {
-            potBubblingSound.play();
-        }
-
-        if (!stirringSound.playing) {
-            stirringSound.play();
+        if (detect == 1){
+            if (!bgm.playing) {
+                bgm.play();
+                console.log('click starting bgm');
+            }
+    
+            if (!potBubblingSound.playing) {
+                potBubblingSound.play();
+            }
+    
+            if (!stirringSound.playing) {
+                stirringSound.play();
+            }
         }
     }, { once: false })
-
-    var detect = 1;
+    
     window.addEventListener('keydown', (event) => {
         if (event.key == 'm') {
             detect++;
@@ -413,9 +415,6 @@ function preUpdate() {
                 }
             }
         }
-        
-        
-        
     }, { once: false })
 
 
