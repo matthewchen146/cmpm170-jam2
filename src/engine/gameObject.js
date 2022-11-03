@@ -79,6 +79,17 @@ class GameObject {
             this.engine.addGameObject(this);
         }
 
+        // a tooltip text that will be displayed if set
+        this.tooltip;
+        this.addEventListener('mousemove', () => {
+            if (this.tooltip) {
+
+            }
+        });
+        this.addEventListener('mouseout', () => {
+
+        });
+
         this.isVisible = true;
         this.setVisible(this.isVisible);
         this.isDestroyed = false;
@@ -479,6 +490,7 @@ class GameObject {
 
     destroy() {
         this.isDestroyed = true;
+        this.element.parentElement?.removeChild(this.element);
         return this;
     }
 
