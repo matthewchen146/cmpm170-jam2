@@ -1,6 +1,8 @@
 
 // sets the GameObject static default container to the selected container below
 GameObject.defaultContainer = document.querySelector('#game-object-container');
+const overlayContainer = document.querySelector('#overlay-container');
+let colorOverlay;
 
 const levelUpSound = new Sound('./assets/sounds/levelup.wav');
 const potBubblingSound = new Sound('./assets/sounds/potbubbling.wav', {loop: true, volume: .2});
@@ -329,12 +331,20 @@ function preUpdate() {
         }
 
         if (foundRecipe) {
+            recipeFoundAnimation(foundRecipe);
             console.log('recipe found!', foundRecipe.name);
             foundRecipe.isKnown = true;
             addRecipe(foundRecipe);
         } else {
+
+            // play an error sound here
             console.log('could not find recipe...');
         }
+
+        craftSlots.crafta?.draggableGameObject.setHomeId('main')
+        craftSlots.crafta = undefined;
+        craftSlots.craftb?.draggableGameObject.setHomeId('main')
+        craftSlots.craftb = undefined;
 
     });
 
@@ -376,24 +386,215 @@ function preUpdate() {
             
         })
 
-    var detect = 1;
+    
+    // create overlay
+    colorOverlay = new GameObject({container: overlayContainer})
+        .setSize(Game.width, Game.height)
+        .setBackgroundColor('black')
+        .setStyle('opacity', 0)
+
+
     window.addEventListener('click', () => {
-        if (detect == 1){
-            if (!bgm.playing) {
-                bgm.play();
-                console.log('click starting bgm');
-            }
-    
-            if (!potBubblingSound.playing) {
-                potBubblingSound.play();
-            }
-    
-            if (!stirringSound.playing) {
-                stirringSound.play();
-            }
+        if (!bgm.playing) {
+            bgm.play();
+            console.log('click starting bgm');
+        }
+
+        if (!potBubblingSound.playing) {
+            potBubblingSound.play();
+        }
+
+        if (!stirringSound.playing) {
+            stirringSound.play();
         }
     }, { once: false })
 
+}
+/**
+ * play a recipe found animation for a recipe
+ * @param {RecipeData} recipe 
+ * 
+ * uses the recipe data such as the recipe image, and its ingredients' images
+ * 
+ * accesses draggable objects
+ * 
+ */
+async function recipeFoundAnimation(recipe) {
+    const container = overlayContainer;
+
+    // disable clicks in the game during animation
+    container.style.pointerEvents = 'all';
+
+    // fade in the overlay
+    new Timer(500)
+        .onUpdate((timer, progress) => {
+            colorOverlay.setStyle('opacity', progress * .7);
+        })
+        .start(true)
+
+    // create potion drop animation
+
+    // create the ingredients
+    const ingredientImages = [];
+    for (const {ingredient} of recipe.getIngredients()) {
+
+        const start = ingredient.draggableGameObject.getGlobalPosition();
+        const end = new Vector2(Game.centerX, Game.centerY);
+        const ingredientImage = new ImageGameObject({container, src: ingredient.img})
+            .setTransitionEnabled(false)
+            .setSize(100, 100)
+            .setOrigin(.5, .5)
+            .setPosition(start)
+            .setTransitionEnabled(true)
+            .setTransitionSpeed(.08)
+            .setPosition(end)
+        ingredientImages.push(ingredientImage);
+    }
+
+    const potionStart = new Vector2(Game.centerX, -100);
+    const potionEnd = new Vector2(Game.centerX, 70);
+
+    const potionSprite = new SpriteGameObject({
+        container,
+        src: './assets/potion-sheet.png',
+        spriteSize: {x: 100, y: 100},
+        imageSize: {x: 400, y: 100},
+    })
+        .setTransitionEnabled(false)
+        .setOrigin(.5, .5)
+        .setSize(150, 150)
+        .setPosition(potionStart)
+
+
+    // move the potion and rotate it to the correct place
+    await new Timer(300).onUpdate((timer, progress) => {
+
+        potionSprite.setPosition(potionStart.lerp(potionEnd, progress));
+        potionSprite.setRotation(progress * -Math.PI * 3 / 4);
+
+    }).start(true);
+
+    for (let i = 0; i < 3; i++) {
+        // create potion drops
+        const dropStart = potionSprite.getPosition().add(0, 60);
+        const drop = new ImageGameObject({container, src: './assets/bubble.png'})
+            .setTransitionEnabled(false)
+            .setSize(30,30)
+            .setPosition(dropStart)
+            .setOrigin(.5, .5)
+        new Timer(100, {autoStart: true}).onUpdate((timer, progress) => {
+
+            drop.setPosition(dropStart.lerp(Game.centerX, Game.centerY, progress));
+            const size = progress * 10 + 39;
+            drop.setSize(size, size);
+
+            if (progress === 1) {
+                drop.destroy();
+            }
+        })
+
+        await new Timer(100).start(true);
+    }
+
+    // retract potion
+    potionEnd.set(potionStart);
+    potionStart.set(potionSprite.getPosition());
+
+    new Timer(200).onUpdate((timer, progress) => {
+
+        potionSprite.setPosition(potionStart.lerp(potionEnd, progress));
+        if (progress === 1) {
+            potionSprite.destroy();
+        }
+
+    }).start()
+
+    // remove ingredient images
+    for (const ingredientImage of ingredientImages) {
+        ingredientImage.destroy();
+    }
+
+    const glow = new ImageGameObject({container, src: './assets/glow-rays.png'})
+        .setTransitionEnabled(false)
+        .setOrigin(.5, .5)
+        .setPosition(Game.centerX, Game.centerY)
+    glow.addAnimationFunction((delta) => {
+        glow.rotate(delta * .001);
+    })
+
+    const recipeImage = new ImageGameObject({container, src: recipe.img})
+        .setTransitionEnabled(false)
+        .setPosition(Game.centerX, Game.centerY)
+        .setOrigin(.5, .5)
+    
+    const titleStart = new Vector2(Game.centerX, Game.centerY);
+    const title = new GameObject({container})
+        .setTransitionEnabled(false)
+        .setPosition(titleStart)
+        .setOrigin(.5, 0)
+        .setText(recipe.name)
+        .setStyle('textAlign', 'center')
+        .setStyle('color', 'linen')
+        .setSize(400, 100)
+        .setStyle('fontSize', `50px`)
+        .setStyle('transform', 'scale(0)')
+
+    // show glow
+    new Timer(300)
+        .onUpdate((timer, progress) => {
+            const glowSize = progress * 500;
+            glow.setSize(glowSize, glowSize);
+            
+        })
+        .start(true)
+
+    // show recipe after glow
+    await new Timer(100).start(true);
+    new Timer(200, {autoStart: true})
+        .onUpdate((timer, progress) => {
+
+            const recipeSize = progress * 300;
+            recipeImage.setSize(recipeSize, recipeSize);
+                       
+        })
+
+
+    // show title after recipe
+    await new Timer(100).start(true);
+    new Timer(200, {autoStart: true})
+        .onUpdate((timer, progress) => {
+
+            const titlePos = titleStart.lerp(Game.centerX, Game.centerY + 150, progress);
+            title.setPosition(titlePos);
+            title.setStyle('transform', `scale(${progress})`);
+            
+        })
+    
+    // show for how long
+    await new Timer(1000).start(true)
+
+    titleStart.set(title.getPosition());
+
+    // fade away
+    await new Timer(200)
+        .onUpdate((timer, progress) => {
+            const glowSize = (1 - progress) * 500;
+            glow.setSize(glowSize, glowSize);
+
+            const recipeSize = (1 - progress) * 300;
+            recipeImage.setSize(recipeSize, recipeSize);
+
+            title.setPosition(titleStart.lerp(Game.centerX, Game.height + 100, progress));
+
+            colorOverlay.setStyle('opacity', (1 - progress) * .7);
+        })
+        .start(true)
+
+    glow.destroy();
+    recipeImage.destroy();
+    title.destroy();
+
+    container.style.pointerEvents = 'none';
 }
 
 // creates a splash in the pot / position
@@ -402,6 +603,7 @@ async function createSplash(position, count = 10) {
     for (let i = 0; i < count; i++) {
         const velocity = new Vector2(i - count / 2, -1).normalize().mul(Math.random() * 3 + 1);
         velocity.y = -Math.random() * 4 - 3;
+        const baseSize = Math.random() * 5 + 20;
 
         let timer = 0;
         let duration = 1000;
@@ -410,7 +612,7 @@ async function createSplash(position, count = 10) {
             .setTransitionEnabled(false)
             .setPosition(source)
             .setOrigin(.5, .5)
-            .setSize(20,20)
+            .setSize(baseSize, baseSize)
         
         particle.setUpdate((delta) => {
 
@@ -420,7 +622,7 @@ async function createSplash(position, count = 10) {
 
             particle.translate(velocity);
 
-            const size = (1 - progress) * 20;
+            const size = (1 - progress) * baseSize;
             particle.setSize(size, size);
 
             if (progress === 1) {
@@ -505,6 +707,9 @@ function update(delta, time) {
     if (Game.isWindowFocused) {
         cookTimer += delta;
     }
+
+    // update all timers
+    Timer.update(delta, time);
 
     // update the calendar
     calendar.update(delta);

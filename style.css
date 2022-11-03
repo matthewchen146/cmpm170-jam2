@@ -82,6 +82,9 @@ main {
     pointer-events: auto;
 }
 
+/* #overlay-container {
+    pointer-events: all;
+} */
 
 /* stats */
 
