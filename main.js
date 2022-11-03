@@ -13,7 +13,17 @@ const bgm = new Sound('./assets/bgm.wav', {loop: true, volume: .2});
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
 async function load() {
-
+    await Promise.all([
+        new Promise((resolve) => {
+            bgm.events.on('canplaythrough', resolve);
+        }),
+        new Promise((resolve) => {
+            potBubblingSound.events.on('canplaythrough', resolve);
+        }),
+        new Promise((resolve) => {
+            stirringSound.events.on('canplaythrough', resolve);
+        })
+    ])
 }
 
 let calendar;
@@ -108,8 +118,6 @@ function addRecipe(recipe) {
         if (recipe === catChef.getRecipe()) {
             return;
         }
-
-        openBook.play();
 
         if (catChef.getRecipe()) {
             // reset previous recipe button's state
@@ -332,14 +340,9 @@ function preUpdate() {
     });
 
 
-    // create the witch cat, stirring the pot
-    // witchCat = new ImageGameObject({
-    //     src: './assets/witch-cat.gif'
-    // })
-    //     .setSize(491, 609)
-    //     .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
-    //     .setPosition(Game.centerX, Game.height)
-    
+    const catSound = new Sound('./assets/sounds/meow.wav', {volume: .5});
+
+    // create the witch cat, stirring the pot   
     witchCat = new SpriteGameObject({
         src: './assets/witch-cat-sheet.png',
         spriteSize: {x: 491, y: 609},
@@ -350,6 +353,17 @@ function preUpdate() {
         .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
         .setPosition(Game.centerX, Game.height)
         .setAutoAnimation(true)
+        .addEventListener('click', (e) => {
+            const mousePos = new Vector2(
+                e.clientX - Game.left,
+                e.clientY - Game.top 
+            )
+
+            if (mousePos.distanceTo(Game.centerX, Game.centerY - 50) < 150) {
+                catSound.play();
+            }
+            
+        })
 
     window.addEventListener('click', () => {
         if (!bgm.playing) {

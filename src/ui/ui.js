@@ -98,7 +98,7 @@ function initializeUI() {
         
     uiObjects.ingredientsDragger = ingredientsDragger;
 
-
+    const dragStartSound = new Sound('./assets/sounds/dragstart.wav', {});
 
     // drag event listeners for the ingredients dragger
     ingredientsDragger.on('dragstart', ({}) => {
@@ -107,6 +107,8 @@ function initializeUI() {
         Object.values(cuttingBoardIngredients).forEach(({draggableGameObject}) => {
             draggableGameObject.setHomeId('main');
         });
+
+        dragStartSound.play();
     })
     .on('dragging', ({object, position, id}) => {
         
