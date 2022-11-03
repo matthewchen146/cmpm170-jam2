@@ -388,31 +388,9 @@ function preUpdate() {
             detect++;
             console.log(detect);
             if (detect % 2 == 0) {
-                if (bgm.playing) {
-                    bgm.pause();
-                    console.log('stopping bgm');
-                }
-        
-                if (potBubblingSound.playing) {
-                    potBubblingSound.pause();
-                }
-        
-                if (stirringSound.playing) {
-                    stirringSound.pause();
-                }
+                Sound.setVolume(0);
             } else {
-                if (!bgm.playing) {
-                    bgm.play();
-                    console.log('click starting bgm');
-                }
-        
-                if (!potBubblingSound.playing) {
-                    potBubblingSound.play();
-                }
-        
-                if (!stirringSound.playing) {
-                    stirringSound.play();
-                }
+                Sound.setVolume(.5);
             }
         }
     }, { once: false })
