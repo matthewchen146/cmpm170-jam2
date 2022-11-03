@@ -37,7 +37,7 @@ class InventoryData {
    
      //updates every second incrementing the total amount of produce by the yield
     updateProduction(){
-        eventEmitter.on('seasonCycle',()=>{switch(getSeason()){   
+        Game.eventEmitter.on('seasonCycle',()=>{switch(getSeason()){   
             case 'spring':
                 // console.log('spring = no apple');
                 let buff=[2,1.5,.5,1];
@@ -237,6 +237,10 @@ class RecipeData {
 
     getIngredientIds() {
         return Object.keys(this.ingredients);
+    }
+
+    getIngredients() {
+        return this.ingredientsData;
     }
 
     // calculate the value of the recipe based on the ingredients and season
