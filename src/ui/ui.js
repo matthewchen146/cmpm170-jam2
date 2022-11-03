@@ -33,6 +33,8 @@ function initializeUI() {
         }, true)
         .setActiveStyle({}, true)
         .setStyle('transition', 'transform 100ms')
+    
+    recipeBookButton.clickSound = undefined;
         
 
     // gets / creates ingredients container as a new GameObject

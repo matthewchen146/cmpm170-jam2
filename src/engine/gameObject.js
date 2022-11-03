@@ -87,13 +87,19 @@ class GameObject {
         this.isTransitionEnabled = true;
         this.transitionUpdateFunction;
 
-        this.setTransitionUpdateFunction(() => {
+        this.animationUpdateFunctions = [];
+
+        this.setTransitionUpdateFunction((...args) => {
 
             if (this.isTransitionEnabled) {
                 this._currentPosition.add(this._position.copy().sub(this._currentPosition).mul(this.transitionSpeed));
                 // this.translate();
             }
             this.setAbsolutePosition(this._currentPosition);
+
+            this.animationUpdateFunctions.forEach((func) => {
+                func(...args);
+            })
             
             this.events.trigger('transitionupdate');
 
@@ -511,6 +517,11 @@ class GameObject {
         return this;
     }
 
+    addAnimationFunction(func) { 
+        this.animationUpdateFunctions.push(func);
+        return this;
+    }
+
     static setDefaultContainer(container) {
         this.defaultContainer = container;
     }
@@ -721,6 +732,10 @@ class ButtonGameObject extends GameObject {
     constructor(options = {}) {
         super(options);
 
+        ButtonGameObject.init();
+
+        this.clickSound = options.clickSound || ButtonGameObject.clickSound;
+
         // default settings for convenience
         this.setOrigin(.5, .5);
         this.setSize(50, 30);
@@ -730,6 +745,9 @@ class ButtonGameObject extends GameObject {
         this.clickCallback;
 
         const handleClick = (e) => {
+            if (this.clickSound) {
+                this.clickSound.play();
+            }
             if (this.clickCallback) {
                 this.clickCallback(e);
             }
@@ -830,6 +848,15 @@ class ButtonGameObject extends GameObject {
         }
         return this;
     }
+
+    static init() {
+        if (!this.initialized) {
+
+            this.clickSound = new Sound('./assets/sounds/buttonclick.wav');
+
+            this.initialized = true;
+        }
+    }
 }
 
 
@@ -855,6 +882,7 @@ class SpriteGameObject extends GameObject {
             
         this.spriteSize = new Vector2(options.spriteSize);
         this.imageSize = new Vector2(options.imageSize);
+        this.frames = new Vector2(options.frames) || (options.imageSize ? new Vector2(this.imageSize.x / this.spriteSize.x, this.imageSize.y / this.spriteSize.y) : undefined);
         
         this.setFrame(options.frame || 0);
         this.setSize(this.spriteSize);
@@ -870,18 +898,45 @@ class SpriteGameObject extends GameObject {
         } else {
             this.setStyle('backgroundSize', 'cover');
         }
-        
+
+        this.isAnimating = false;
+        this.animationDuration = this.frames ? (this.frames.x + this.frames.y) * 200 : 5000;
+        this.animationFrame = this.getFrame();
+        this.animationTimer = 0;
+        this.lastFrame = this.animationFrame;
+
+        this.animationUpdate = (delta) => {
+
+            if (this.frames && this.isAnimating) {
+                
+                this.animationFrame = Math.floor(this.animationTimer / this.animationDuration * this.frames.x);
+                if (this.animationFrame !== this.lastFrame) {
+                    this.setFrame(this.animationFrame);
+                    this.lastFrame = this.animationFrame;
+                }
+
+                if (this.animationTimer >= this.animationDuration) {
+                    this.animationTimer -= this.animationDuration;
+                }
+                this.animationTimer += delta;
+            }
+
+        }
+
+        this.addAnimationFunction(this.animationUpdate);
+
     }
 
     setFrame(frame) {
         this._frame = frame;
         const xOffset = -this._frame * this.spriteSize.x * (this._size.x / this.spriteSize.x);
         this.setStyle('backgroundPosition', `${xOffset}px ${0}px`);
+        this.animationFrame = this._frame;
         return this;
     }
 
     getFrame() {
-        return this._frame;
+        return this._frame || 0;
     }
 
     setSize(x, y) {
@@ -889,6 +944,11 @@ class SpriteGameObject extends GameObject {
         if (this.spriteSize) {
             this.setFrame(this._frame);
         }
+        return this;
+    }
+    
+    setAutoAnimation(bool) {
+        this.isAnimating = bool;
         return this;
     }
 }

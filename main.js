@@ -2,17 +2,13 @@
 // sets the GameObject static default container to the selected container below
 GameObject.defaultContainer = document.querySelector('#game-object-container');
 
-
-const openBook = new Sound("https://www.fesliyanstudios.com/play-mp3/5804");
-const closeBook = new Sound("https://www.fesliyanstudios.com/play-mp3/5765")
-const flipPage = new Sound("https://www.fesliyanstudios.com/play-mp3/5477");
-
 const levelUpSound = new Sound('./assets/sounds/levelup.wav');
+const potBubblingSound = new Sound('./assets/sounds/potbubbling.wav', {loop: true, volume: .2});
+const stirringSound = new Sound('./assets/sounds/stirring.wav', {loop: true, volume: .2});
 
-const audio1 = new Sound("assets/sounds/512131__beezlefm__coins-small-sound.wav")
+// const audio1 = new Sound("assets/sounds/512131__beezlefm__coins-small-sound.wav")
 
-// const bgm = new Audio();
-let bgm;
+const bgm = new Sound('./assets/bgm.wav', {loop: true, volume: .2});
 
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
@@ -337,28 +333,38 @@ function preUpdate() {
 
 
     // create the witch cat, stirring the pot
-    witchCat = new ImageGameObject({
-        src: './assets/witch-cat.gif'
+    // witchCat = new ImageGameObject({
+    //     src: './assets/witch-cat.gif'
+    // })
+    //     .setSize(491, 609)
+    //     .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
+    //     .setPosition(Game.centerX, Game.height)
+    
+    witchCat = new SpriteGameObject({
+        src: './assets/witch-cat-sheet.png',
+        spriteSize: {x: 491, y: 609},
+        imageSize: {x: 5401, y: 609},
+        frames: {x: 11, y: 1}
     })
-        .setSize(491, 609)
+        // .setSize(491, 609)
         .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
         .setPosition(Game.centerX, Game.height)
-    
-    bgm = new Sound('./assets/bgm.wav');
-    
-    bgm.events.once('canplaythrough', () => {    
-        bgm.loop = true;
-        bgm.volume = .2;
-        bgm.play();
-        // console.log('canplaythrough starting bgm')
-    })
+        .setAutoAnimation(true)
 
     window.addEventListener('click', () => {
         if (!bgm.playing) {
             bgm.play();
             console.log('click starting bgm');
         }
-    }, { once: true })
+
+        if (!potBubblingSound.playing) {
+            potBubblingSound.play();
+        }
+
+        if (!stirringSound.playing) {
+            stirringSound.play();
+        }
+    }, { once: false })
 
 }
 

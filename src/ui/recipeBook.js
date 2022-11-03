@@ -6,10 +6,23 @@
  * except for the position
  */
 class RecipeBook extends GameObject {
+
+    static init() {
+        if (!this.initialized) {
+            this.openSound = new Sound('https://www.fesliyanstudios.com/play-mp3/5804', {});
+            this.closeSound = new Sound('https://www.fesliyanstudios.com/play-mp3/5765', {});
+            this.flipSound = new Sound('https://www.fesliyanstudios.com/play-mp3/5477', {});
+
+            this.initialized = true;
+        }
+    }
+
     constructor(options = {}) {
         super(options);
         this.pages = [];
         this.pageIndex = 0;
+
+        RecipeBook.init();
 
         // create recipe book content
         // const recipeBook = new GameObject({container: uiContainer})
@@ -40,6 +53,7 @@ class RecipeBook extends GameObject {
             .setDefaultStyle({transform: `scale(1, 1)`}, true)
             .setHoverStyle({transform: `scale(1.25, 1.25)`}, true)
             .setActiveStyle({transform: `scale(1.5, 1.5)`}, true)
+        this.closeButton.clickSound = undefined;
 
 
         // create page flipping buttons
@@ -55,6 +69,7 @@ class RecipeBook extends GameObject {
             .setHoverStyle({transform: `scale(1.25, 1.25)`}, true)
             .setActiveStyle({transform: `scale(1.5, 1.5)`}, true)
             .setStyle('backgroundImage', 'url("./assets/arrow-right.png")')
+        this.nextPageButton.clickSound = undefined;
 
         this.prevPageButton = new ButtonGameObject({container: this})
             .setText('')
@@ -67,6 +82,7 @@ class RecipeBook extends GameObject {
             .setHoverStyle({transform: `scale(-1.25, 1.25)`}, true)
             .setActiveStyle({transform: `scale(-1.5, 1.5)`}, true)
             .setStyle('backgroundImage', 'url("./assets/arrow-right.png")')
+        this.prevPageButton.clickSound = undefined;
     }
 
     // get the array of pages. not a duplicate
@@ -173,14 +189,18 @@ class RecipeBook extends GameObject {
     // flip to next page
     nextPage() {
         this.flipToPage(this.pageIndex + 1);
-        flipPage.play();
+        if (RecipeBook.flipSound) {
+            RecipeBook.flipSound.play();
+        }
         return this;
     }
     
     // flip to previous page
     prevPage() {
         this.flipToPage(this.pageIndex - 1);
-        flipPage.play();
+        if (RecipeBook.flipSound) {
+            RecipeBook.flipSound.play();
+        }
         return this;
     }
 
@@ -193,7 +213,9 @@ class RecipeBook extends GameObject {
         this.flipToPage(page);
         this.isOpen = true;
         this.events.trigger('open');
-        openBook.play();
+        if (RecipeBook.openSound) {
+            RecipeBook.openSound.play();
+        }
         return this;
     }
 
@@ -205,7 +227,9 @@ class RecipeBook extends GameObject {
         this.setVisible(false);
         this.isOpen = false;
         this.events.trigger('close');
-        closeBook.play();
+        if (RecipeBook.closeSound) {
+            RecipeBook.closeSound.play();
+        }
         return this;
     }
 }
