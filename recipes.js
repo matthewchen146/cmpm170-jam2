@@ -53,4 +53,22 @@ const rawRecipes = {
         name: 'Pumpkin Corn Soup',
         img: './assets/recipes/pumpkin-corn-soup.png',
     },
+    cranberrycorncake: {
+        ingredients: {
+            corn: 1,
+            berries: 1
+        },
+        value: 3,
+        name: 'Cranberry Corn Cake',
+        img: './assets/recipes/cranberry-corn-cake.png',
+    },
+    cranberrypumpkinpie: {
+        ingredients: {
+            berries: 1,
+            pumpkin: 1
+        },
+        value: 3,
+        name: 'Cranberry Pumpkin Pie',
+        img: './assets/recipes/cranberry-pumpkin-soup.png',
+    },
 }
