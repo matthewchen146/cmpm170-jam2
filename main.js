@@ -380,6 +380,46 @@ function preUpdate() {
         }
     }, { once: false })
 
+    var detect = 1;
+    window.addEventListener('keydown', (event) => {
+        if (event.key == 'm') {
+            detect++;
+            console.log(detect);
+            if (detect % 2 == 0) {
+                if (bgm.playing) {
+                    bgm.pause();
+                    console.log('stopping bgm');
+                }
+        
+                if (potBubblingSound.playing) {
+                    potBubblingSound.pause();
+                }
+        
+                if (stirringSound.playing) {
+                    stirringSound.pause();
+                }
+            } else {
+                if (!bgm.playing) {
+                    bgm.play();
+                    console.log('click starting bgm');
+                }
+        
+                if (!potBubblingSound.playing) {
+                    potBubblingSound.play();
+                }
+        
+                if (!stirringSound.playing) {
+                    stirringSound.play();
+                }
+            }
+        }
+        
+        
+        
+    }, { once: false })
+
+
+
 }
 
 
