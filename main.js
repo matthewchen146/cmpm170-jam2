@@ -36,6 +36,7 @@ let uiObjects;
 let witchCat;
 
 let potion;
+let potionSprite;
 
 let selectedRecipes = [];
 let possibleIngredients = {};
@@ -413,6 +414,16 @@ function preUpdate() {
             
         })
 
+    potionSprite = new SpriteGameObject({
+        src: './assets/potion-sheet.png',
+        spriteSize: {x: 100, y: 100},
+        imageSize: {x: 400, y: 100}
+    })
+        .setOrigin(.5, .5)
+        .setPosition(Game.width - 50, Game.height - 300)
+    potionSprite.addAnimationFunction((delta, time) => {
+            potionSprite.setPosition(Game.width - 50, Game.height - 300 + Math.sin(time * .003) * 20)
+        })
     
     // create overlay
     colorOverlay = new GameObject({container: overlayContainer})
@@ -441,7 +452,7 @@ function preUpdate() {
 
 const drumrollSound = new Sound('./assets/sounds/drumroll.wav');
 const cymbalSound = new Sound('./assets/sounds/cymbal.wav');
-const dripSoundEffect = new Sound('./assets/sounds/drip.wav', {volume: .6});
+const dripSound = new Sound('./assets/sounds/drip.wav', {volume: .4});
 /**
  * play a recipe found animation for a recipe
  * @param {RecipeData} recipe 
@@ -486,10 +497,10 @@ async function recipeFoundAnimation(recipe) {
         ingredientImages.push(ingredientImage);
     }
 
-    const potionStart = new Vector2(Game.centerX, -100);
+    const potionStart = new Vector2(potionSprite.getGlobalPosition());//new Vector2(Game.centerX, -100);
     const potionEnd = new Vector2(Game.centerX, 70);
 
-    const potionSprite = new SpriteGameObject({
+    const animatedPotionSprite = new SpriteGameObject({
         container,
         src: './assets/potion-sheet.png',
         spriteSize: {x: 100, y: 100},
@@ -504,15 +515,15 @@ async function recipeFoundAnimation(recipe) {
     // move the potion and rotate it to the correct place
     await new Timer(300).onUpdate((timer, progress) => {
 
-        potionSprite.setPosition(potionStart.lerp(potionEnd, progress));
-        potionSprite.setRotation(progress * -Math.PI * 3 / 4);
+        animatedPotionSprite.setPosition(potionStart.lerp(potionEnd, progress));
+        animatedPotionSprite.setRotation(progress * -Math.PI * 3 / 4);
 
     }).start(true);
 
     for (let i = 0; i < 3; i++) {
         // create potion drops
-        dripSoundEffect.play();
-        const dropStart = potionSprite.getPosition().add(0, 60);
+        dripSound.play();
+        const dropStart = animatedPotionSprite.getPosition().add(0, 60);
         const drop = new ImageGameObject({container, src: './assets/bubble.png'})
             .setTransitionEnabled(false)
             .setSize(30,30)
@@ -534,13 +545,15 @@ async function recipeFoundAnimation(recipe) {
 
     // retract potion
     potionEnd.set(potionStart);
-    potionStart.set(potionSprite.getPosition());
+    potionStart.set(animatedPotionSprite.getPosition());
+    const potionStartRot = animatedPotionSprite.getRotation();
 
     new Timer(200).onUpdate((timer, progress) => {
 
-        potionSprite.setPosition(potionStart.lerp(potionEnd, progress));
+        animatedPotionSprite.setPosition(potionStart.lerp(potionEnd, progress))
+            .setRotation(potionStartRot * (1 - progress))
         if (progress === 1) {
-            potionSprite.destroy();
+            animatedPotionSprite.destroy();
         }
 
     }).start()
@@ -716,6 +729,35 @@ async function cookAnimation(recipe) {
 
         await new Timer(200).start(true);
     }
+
+    const start = potionSprite.getGlobalPosition().add(-40,-40);
+    const end = {x: Game.centerX, y: 480};
+    const control = {x: start.x + (end.x - start.x) / 2, y: 300};
+    const curve = new BilinearCurve(start, control, end);
+
+    const newFrame = potionSprite.getFrame() === 3 ? 0 : potionSprite.getFrame() + 1;
+    potionSprite.setFrame(newFrame);
+
+    if (potionSprite.getFrame() === 3) {
+        new Timer(400, {autoStart: true}).onUpdate((timer, progress) => {
+            potionSprite.setFrame(Math.floor((1 - progress) * 3.9));
+        })
+    }
+
+    // add potion drop
+    const drop = new ImageGameObject({src: './assets/bubble.png'})
+        .setTransitionEnabled(false)
+        .setPosition(start)
+        .setOrigin(.5, .5)
+        .setSize(30, 30)
+    // dripSound.play();
+    new Timer(500, {autoStart: true}).onUpdate((timer, progress) => {
+        drop.setPosition(curve.at(progress));
+
+        if (progress === 1) {
+            drop.destroy();
+        }
+    });
 }
 
 let cookTimer = 0;
