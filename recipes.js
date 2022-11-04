@@ -145,4 +145,15 @@ const rawRecipes = {
         name: 'Cranberry Pumpkin Pie',
         img: './assets/recipes/cranberry-pumpkin-pie.png',
     },
+    cornapplesalad: {
+        ingredients: {
+            corn: 1,
+            apple: 1
+        },
+        potionLevel: 1,
+        catLevel: 1,
+        value: 2,
+        name: 'Corn Apple Salad',
+        img: './assets/recipes/corn-apple-salad.png',
+    },
 }
