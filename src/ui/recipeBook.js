@@ -11,7 +11,7 @@ class RecipeBook extends GameObject {
         if (!this.initialized) {
             this.openSound = new Sound('./assets/sounds/openBook.mp3', {});
             this.closeSound = new Sound('./assets/sounds/closeBook.mp3', {});
-            this.flipSound = new Sound('./assets/sounds/flipPage.mp3', {});
+            this.flipSound = new Sound('./assets/sounds/pageflip.wav', {});
 
             this.initialized = true;
         }

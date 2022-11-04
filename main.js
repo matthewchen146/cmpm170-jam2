@@ -414,6 +414,11 @@ function preUpdate() {
     }, { once: false })
 
 }
+
+
+const drumrollSound = new Sound('./assets/sounds/drumroll.wav');
+const cymbalSound = new Sound('./assets/sounds/cymbal.wav');
+const dripSoundEffect = new Sound('./assets/sounds/drip.wav', {volume: .6});
 /**
  * play a recipe found animation for a recipe
  * @param {RecipeData} recipe 
@@ -428,6 +433,9 @@ async function recipeFoundAnimation(recipe) {
 
     // disable clicks in the game during animation
     container.style.pointerEvents = 'all';
+
+    // drumroll play
+    drumrollSound.play();
 
     // fade in the overlay
     new Timer(500)
@@ -480,6 +488,7 @@ async function recipeFoundAnimation(recipe) {
 
     for (let i = 0; i < 3; i++) {
         // create potion drops
+        dripSoundEffect.play();
         const dropStart = potionSprite.getPosition().add(0, 60);
         const drop = new ImageGameObject({container, src: './assets/bubble.png'})
             .setTransitionEnabled(false)
@@ -562,7 +571,6 @@ async function recipeFoundAnimation(recipe) {
                        
         })
 
-
     // show title after recipe
     await new Timer(100).start(true);
     new Timer(200, {autoStart: true})
@@ -574,6 +582,10 @@ async function recipeFoundAnimation(recipe) {
             
         })
     
+    // stop drumroll
+    drumrollSound.stop();
+    cymbalSound.play();
+
     // show for how long
     await new Timer(1000).start(true)
 
@@ -602,7 +614,10 @@ async function recipeFoundAnimation(recipe) {
 }
 
 // creates a splash in the pot / position
+const splashSound = new Sound('./assets/sounds/splash.wav', {volume: .15});
+
 async function createSplash(position, count = 10) {
+    splashSound.play();
     const source = new Vector2(position);
     for (let i = 0; i < count; i++) {
         const velocity = new Vector2(i - count / 2, -1).normalize().mul(Math.random() * 3 + 1);
@@ -676,7 +691,7 @@ async function cookAnimation(recipe) {
             timer += delta;
         })
 
-        await new Promise((resolve) => { setTimeout(resolve, 200)})
+        await new Timer(200).start(true);
     }
 }
 

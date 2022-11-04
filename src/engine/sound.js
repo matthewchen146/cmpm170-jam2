@@ -110,6 +110,12 @@ class Sound {
         return this.audio.paused;
     }
 
+    stop() {
+        this.pause();
+        this.audio.currentTime = 0;
+        return this;
+    }
+
     setLoop(bool = false) {
         this.audio.loop = bool;
         return this;
