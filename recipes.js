@@ -44,6 +44,15 @@ const rawRecipes = {
         name: 'Cranberry Pumpkin Muffin',
         img: './assets/recipes/cranberry-pumpkin-muffin.png',
     },
+    corncranberrymuffin: {
+        ingredients: {
+            berries: 1,
+            corn: 1
+        },
+        value: 1.5,
+        name: 'Corn Cranberry Muffin',
+        img: './assets/recipes/corn-cranberry-muffin.png',
+    },
     pumpkincranberrytart: {
         ingredients: {
             berries: 1,
