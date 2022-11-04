@@ -94,6 +94,29 @@ function addIngredient(ingredient) {
         
     });
 
+
+    const buffIndicator = new GameObject({container: draggableGameObject.getParent()})
+        .setTransitionEnabled(false)
+        .setSize(40,40)
+        .setStyle('opacity', .9)
+        .setStyle('borderRadius', '20px')
+        .setStyle('display', 'flex')
+        .setStyle('justifyContent', 'center')
+        .setStyle('alignItems', 'center')
+        .setStyle('fontSize', '20px')
+        .setStyle('fontWeight', 'bold')
+        .setOrigin(.5, .5)
+    buffIndicator.addAnimationFunction((delta, time) => {
+        const maxValue = 2;
+        const value = ingredient.getSeasonValue();
+        const g = value / maxValue;
+        const r = (1 - g);
+        buffIndicator.setText(`x${value}`)
+            .setBackgroundColor(`rgb(${r * 255}, ${g * 255}, 0)`)
+            .setPosition(draggableGameObject.getGlobalPosition().add(30,30))
+            .setStyle('opacity', (Math.sin(time * .005) * .2 + .8) * .8)
+    })
+
     return data;
 }
 

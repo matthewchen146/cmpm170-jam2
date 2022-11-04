@@ -206,6 +206,10 @@ class IngredientData extends UpgradeableData {
         const currentSeason = season;
         return this.level * this.seasonBuff[currentSeason] * this.baseMultiplier;
     }
+
+    getSeasonValue(season = (IngredientData.season !== undefined ? IngredientData.season : undefined) || this.season) {
+        return this.baseMultiplier * this.seasonBuff[season];
+    }
 }
 
 //holds ingredients needed
