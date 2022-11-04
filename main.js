@@ -728,7 +728,7 @@ function update(delta, time) {
     
     // cat cooks and returns the currency earned, can take a recipe argument and season argument
     // if no season argument, the season is determined by the season set in STATIC IngredientData.season
-    const rate = catChef.cook(); // per second
+    const rate = catChef.cook(undefined, IngredientData.season); // per second
 
     uiObjects.currencyRateLabel.textContent = `${rate} cn/s`;
 
