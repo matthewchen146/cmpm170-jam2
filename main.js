@@ -220,8 +220,8 @@ function preUpdate() {
     })
     
     // read raw recipes from recipes.js and create recipes
-    Object.entries(rawRecipes).forEach(([id, {ingredients, name, img, isKnown, value}]) => {
-        const recipe = createRecipe(id, ingredients, { name, img, isKnown, value });
+    Object.entries(rawRecipes).forEach(([id, {ingredients, name, img, isKnown, value, catLevel, potionLevel}]) => {
+        const recipe = createRecipe(id, ingredients, { name, img, isKnown, value, catLevel, potionLevel });
         if (recipe.isKnown) {
             addRecipe(recipe);
         }
@@ -324,9 +324,13 @@ function preUpdate() {
         // find a recipe in possible recipes that has the same ingredients
         let foundRecipe;
         for (const recipe of Object.values(possibleRecipes)) {
-            if (!recipe.isKnown && recipe.checkIngredients(ingredients)) {
-                foundRecipe = recipe;
-                break;
+            if (!recipe.isKnown) {
+                if (catChef.level >= recipe.catLevel && catChef.potion.level >= recipe.potionLevel) {
+                    if (recipe.checkIngredients(ingredients)) {
+                        foundRecipe = recipe;
+                        break;
+                    }
+                }
             }
         }
 

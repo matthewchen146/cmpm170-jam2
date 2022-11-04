@@ -228,6 +228,8 @@ class RecipeData {
             }
         });
         this.value = options.value || options.baseMultiplier || 1;
+        this.catLevel = options.catLevel || 1;
+        this.potionLevel = options.potionLevel || 1;
 
         // reference to the select button on the recipe page of the book
         this.selectButton;
