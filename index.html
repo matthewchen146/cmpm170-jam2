@@ -36,9 +36,13 @@
         </div>
         <div id="settings-container">
             <h2>Settings</h2>
-            <label for="volume">Volume</label>
-            <input type="range" name="" id="volume" min="0" max="1" step=".05">
-            <button id="mute">Mute</button>
+            <div>
+                <label for="volume">Volume</label>
+                <input type="range" name="" id="volume" min="0" max="1" step=".05">
+                <button id="mute">Mute</button>
+            </div>
+            <button id="reset-game">Reset Game</button>
+            <div id="reset-game-label"></div>
             <script>
 
                 const volumeInput = document.querySelector('#settings-container #volume');
@@ -59,6 +63,42 @@
                         muteButton.textContent = 'Unmute';
                     }
                     muted = !muted;
+                })
+
+                let resetStep = 0;
+                let resetTimeout;
+                const resetGameLabel = document.querySelector('#reset-game-label');
+                const resetGameButton = document.querySelector('#reset-game');
+                resetGameButton.addEventListener('click', () => {
+                    switch (resetStep) {
+                        case 0:
+                            resetGameLabel.textContent = 'Are you sure?'
+                            break;
+                        case 1:
+                            resetGameLabel.textContent = 'Are you really sure?'
+                            break;
+                        case 2:
+                            resetGameLabel.textContent = 'Everything will be gone!'
+                            break;
+                        case 3:
+                            resetGameLabel.textContent = 'Last warning!!!'
+                            break;
+                        case 4:
+                            resetGameLabel.textContent = 'Last warning I swear!!!!'
+                            break;
+                        case 5:
+                            resetGameLabel.textContent = 'Resetting game...'
+                            resetGame();
+                        default:
+                            break;
+                    }
+                    resetStep += 1;
+
+                    clearTimeout(resetTimeout);
+                    resetTimeout = setTimeout(() => {
+                        resetStep = 0;
+                        resetGameLabel.textContent = '';
+                    }, 5000);
                 })
 
             </script>

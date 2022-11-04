@@ -29,6 +29,14 @@ main {
 #settings-container {
     color: linen;
     user-select: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#settings-container > * {
+    margin-bottom: 5px;
 }
 
 #settings-container h2 {
@@ -38,6 +46,14 @@ main {
 
 #settings-container #mute {
     width: 50px;
+}
+
+#settings-container #reset-game {
+    width: 80px;
+}
+
+#settings-container #reset-game-label {
+    height: 20px;
 }
 
 #game-wrapper {

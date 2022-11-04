@@ -46,6 +46,86 @@ const craftSlots = {
     craftb: undefined
 }
 
+function saveGame() {
+    console.log('saving game')
+    localStorage.setItem('catLevel', catChef.level);
+    localStorage.setItem('potionLevel', potion.level);
+    localStorage.setItem('currency', catChef.currency);
+    localStorage.setItem('calendarData', JSON.stringify({
+        month: calendar.getMonth(),
+        timer: calendar.timer
+    }));
+    // save ingredient levels
+    const ingredientData = {}
+    Object.entries(possibleIngredients).forEach(([id, ingredient]) => {
+        ingredientData[id] = {
+            level: ingredient.level
+        }
+    });
+    localStorage.setItem('ingredientData', JSON.stringify(ingredientData));
+    // save recipe data such as isKnown
+    const recipeData = {};
+    Object.entries(possibleRecipes).forEach(([id, recipe]) => {
+        recipeData[id] = {
+            isKnown: recipe.isKnown
+        }
+    });
+    localStorage.setItem('recipeData', JSON.stringify(recipeData));
+}
+
+function loadGame() {
+    console.log('loading game')
+    const catLevel = localStorage.getItem('catLevel');
+    if (catLevel) {
+        catChef.setLevel(+catLevel);
+    }
+    const currency = localStorage.getItem('currency');
+    if (currency) {
+        catChef.currency = +currency;
+    }
+    const potionLevel = localStorage.getItem('potionLevel');
+    if (potionLevel) {
+        potion.setLevel(+potionLevel);
+    }
+    const calendarData = localStorage.getItem('calendarData');
+    if (calendarData) {
+        const {timer, month} = JSON.parse(calendarData);
+        calendar.timer = timer;
+        calendar.month = month;
+        seasonSprite.setFrame(calendar.getSeason())
+    }
+    // load ingredient levels and such
+    const ingredientData = localStorage.getItem('ingredientData');
+    if (ingredientData) {
+        Object.entries(JSON.parse(ingredientData)).forEach(([id, {level}]) => {
+            possibleIngredients[id]?.setLevel(level);
+        })
+    }
+    // load recipe data such as isKnown
+    const recipeData = localStorage.getItem('recipeData');
+    if (recipeData) {
+        Object.entries(JSON.parse(recipeData)).forEach(([id, {isKnown}]) => {
+            const recipe = possibleRecipes[id];
+            if (recipe && !recipe.isKnown && isKnown) {
+                recipe.isKnown = true;
+                addRecipe(recipe);
+            }
+        });
+    }
+}
+
+function clearSave() {
+    localStorage.clear();
+}
+
+let saveOnExit = true;
+
+function resetGame() {
+    clearSave();
+    saveOnExit = false;
+    location.reload();
+}
+
 /** 
  * handles adding an ingredient to the GAME
  * returns {
@@ -109,7 +189,7 @@ function addIngredient(ingredient) {
         .setOrigin(.5, .5)
     buffIndicator.addAnimationFunction((delta, time) => {
         const maxValue = 2;
-        const value = ingredient.getSeasonValue(IngredientData.season);
+        const value = ingredient.getSeasonValue(calendar.getSeason());
         const g = value / maxValue;
         const r = (1 - g);
         buffIndicator.setText(`x${value}`)
@@ -132,7 +212,7 @@ function getRecipe(id) {
     return possibleRecipes[id];
 }
 
-// handles adding a recipe to the GAME
+// handles adding a recipe to the known recipes, making it available to be upgraded
 function addRecipe(recipe) {
     const {selectButton} = uiObjects.recipePageData.addRecipe(recipe);
     recipe.selectButton = selectButton;
@@ -154,6 +234,7 @@ function addRecipe(recipe) {
     })
 }
 
+// handles creating recipe data and storing in possible recipes
 function createRecipe(id, ingredients, options) {
     possibleRecipes[id] = new RecipeData(id, ingredients, options);
     return possibleRecipes[id];
@@ -447,6 +528,14 @@ function preUpdate() {
         }
     }, { once: false })
 
+
+    window.addEventListener('beforeunload', () => {
+        if (saveOnExit) {
+            saveGame();
+        }
+    })
+
+    loadGame();
 }
 
 
@@ -770,7 +859,7 @@ function update(delta, time) {
     
     // cat cooks and returns the currency earned, can take a recipe argument and season argument
     // if no season argument, the season is determined by the season set in STATIC IngredientData.season
-    const rate = catChef.cook(undefined, IngredientData.season); // per second
+    const rate = catChef.cook(undefined, calendar.getSeason()); // per second
 
     uiObjects.currencyRateLabel.textContent = `${rate} cn/s`;
 
