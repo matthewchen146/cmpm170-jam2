@@ -51,8 +51,8 @@ const rawRecipes = {
             berries: 1,
             corn: 1
         },
-        potionLevel: 1,
-        catLevel: 1,
+        potionLevel: 3,
+        catLevel: 3,
         value: 2,
         name: 'Corn Cranberry Muffin',
         img: './assets/recipes/corn-cranberry-muffin.png',
