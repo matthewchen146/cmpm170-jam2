@@ -35,6 +35,15 @@ const rawRecipes = {
         img: './assets/recipes/cranberry-tart.png',
         isKnown: true
     },
+    cranberrycaramelapple: {
+        ingredients: {
+            apple: 1,
+            berries: 1
+        },
+        value: 1.5,
+        name: 'Cranberry Caramel Apple',
+        img: './assets/recipes/cranberry-caramel-apple.png',
+    },
     applepumpkinpie: {
         ingredients: {
             apple: 1,
@@ -70,6 +79,15 @@ const rawRecipes = {
         value: 3,
         name: 'Cranberry Corn Cake',
         img: './assets/recipes/cranberry-corn-cake.png',
+    },
+    pumpkincorncake: {
+        ingredients: {
+            corn: 1,
+            pumpkin: 1
+        },
+        value: 4,
+        name: 'Pumpkin Corn Cake',
+        img: './assets/recipes/pumpkin-corn-cake.png',
     },
     cranberrypumpkinpie: {
         ingredients: {
