@@ -221,6 +221,12 @@ function initializeCreditsPage(recipeBook) {
     centerContainer.classList.toggle('dotted-border', true);
     // centerContainer.style.padding = '10px';
     page.appendChild(centerContainer);
+
+    const content = document.querySelector('#credits-content');
+    if (content) {
+        content.parentElement.removeChild(content);
+        centerContainer.appendChild(content);
+    }
 }
 
 // move upgrade buttons into ui objects
