@@ -176,7 +176,7 @@ function preUpdate() {
         img: './assets/apple.png',
 
         // cost function for ingredients
-        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        costFunction: (level) => { return level * Math.pow(2, level) + 100 * level; },
 
         // base value / multiplier for the ingredient
         baseMultiplier: 1
@@ -187,7 +187,7 @@ function preUpdate() {
         seasonBuff: [1.5, 1, .5, 2],
         img: './assets/pumpkin.png',
 
-        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        costFunction: (level) => { return level * Math.pow(2, level) + 100 * level; },
         baseMultiplier: 1
     });
     possibleIngredients['corn'] = new IngredientData('corn', {
@@ -196,7 +196,7 @@ function preUpdate() {
         seasonBuff: [1, .5, 2, 1.5],
         img: './assets/corn.png',
 
-        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        costFunction: (level) => { return level * Math.pow(2, level) + 100 * level; },
         baseMultiplier: 1
     });
     possibleIngredients['berries'] = new IngredientData('berries', {
@@ -205,7 +205,7 @@ function preUpdate() {
         seasonBuff: [2, 1.5, 1, .5],
         img: './assets/berries.png',
 
-        costFunction: (level) => { return level * Math.pow(10, level) + 200 * level; },
+        costFunction: (level) => { return level * Math.pow(2, level) + 100 * level; },
         baseMultiplier: 1
     });
 
@@ -232,11 +232,11 @@ function preUpdate() {
     catChef = new ChefData({
         img: './assets/cat-head.png',
         costFunction: (level) => {
-            return Math.pow(10, level) + level * 1000;
+            return Math.pow(5, level) + level * 500;
         },
 
         // modify the multiplier of the catchef
-        productionMultiplier: 1
+        productionMultiplier: 1.5
     });
 
     
@@ -257,7 +257,7 @@ function preUpdate() {
         },
 
         // set the base multiplier of the potion
-        baseMultiplier: 10
+        baseMultiplier: 2
     });
 
     catChef.setPotion(potion);
