@@ -254,3 +254,15 @@ main {
     align-items: center;
 
 }
+
+
+#credits-content {
+    font-size: 16px;
+    width: 300px;
+    height: auto;
+    padding: 20px;
+}
+
+#credits-content > h3 {
+    text-decoration: underline;
+}
