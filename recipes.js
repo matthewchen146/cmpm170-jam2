@@ -35,12 +35,21 @@ const rawRecipes = {
         img: './assets/recipes/cranberry-tart.png',
         isKnown: true
     },
-    pumpkincranberrytart: {
+    cranberrypumpkinmuffin: {
         ingredients: {
             berries: 1,
             pumpkin: 1
         },
         value: 1.5,
+        name: 'Cranberry Pumpkin Muffin',
+        img: './assets/recipes/cranberry-pumpkin-muffin.png',
+    },
+    pumpkincranberrytart: {
+        ingredients: {
+            berries: 1,
+            pumpkin: 1
+        },
+        value: 2,
         name: 'Pumpkin Cranberry Tart',
         img: './assets/recipes/pumpkin-cranberry-tart.png',
     },
