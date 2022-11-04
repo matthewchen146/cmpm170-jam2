@@ -108,7 +108,7 @@ function addIngredient(ingredient) {
         .setOrigin(.5, .5)
     buffIndicator.addAnimationFunction((delta, time) => {
         const maxValue = 2;
-        const value = ingredient.getSeasonValue();
+        const value = ingredient.getSeasonValue(IngredientData.season);
         const g = value / maxValue;
         const r = (1 - g);
         buffIndicator.setText(`x${value}`)
