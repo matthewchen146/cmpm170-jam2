@@ -13,6 +13,18 @@ const bgm = new Sound('./assets/bgm.wav', {loop: true, volume: .2});
 // use this function to load things like assets
 // it is asynchronous so it can use Promises
 async function load() {
+    const uiContainer = document.querySelector('#ui-container');
+    uiContainer.hidden = true;
+
+    const loadingText = new GameObject({positionMode: GameObject.PositionModes.NONE})
+        .setText('Loading...')
+        .setStyle('width', '100%')
+        .setStyle('height', '100%')
+        .setStyle('display', 'flex')
+        .setStyle('justifyContent', 'center')
+        .setStyle('alignItems', 'center')
+        .setStyle('fontSize', '80px')
+
     // wait for main sounds to load
     await Promise.all([
         new Promise((resolve) => {
@@ -25,6 +37,11 @@ async function load() {
             stirringSound.events.on('canplaythrough', resolve);
         })
     ])
+
+    // await new Promise(resolve => setTimeout(resolve, 5000))
+
+    loadingText.destroy();
+    uiContainer.hidden = false;
 }
 
 let calendar;
@@ -251,6 +268,7 @@ function preUpdate() {
         spriteSize: {x: 100, y: 100},
         imageSize: {x: 400, y: 100}
     })
+        .setTransitionEnabled(false)
         .setSize(150, 150)
         .setPosition(95, 245)
         .setOrigin(.5, .5)
@@ -479,7 +497,7 @@ function preUpdate() {
         imageSize: {x: 5401, y: 609},
         frames: {x: 11, y: 1}
     })
-        // .setSize(491, 609)
+        .setTransitionEnabled(false)
         .setOrigin(.46, 1) // .46 is a good value to center the pot horizontally
         .setPosition(Game.centerX, Game.height)
         .setAutoAnimation(true)
@@ -500,6 +518,7 @@ function preUpdate() {
         spriteSize: {x: 100, y: 100},
         imageSize: {x: 400, y: 100}
     })
+        .setTransitionEnabled(false)
         .setOrigin(.5, .5)
         .setPosition(Game.width - 50, Game.height - 300)
     potionSprite.addAnimationFunction((delta, time) => {

@@ -21,6 +21,7 @@ function initializeUI() {
 
     // creates recipe book button
     const recipeBookButton = new ButtonGameObject({container: uiContainer, tag: 'img'})
+        .setTransitionEnabled(false)
         .setAttribute('src', './assets/book-small.png')
         .setPosition(Game.width - 70, 90)
         .setSize(125,125)
@@ -43,14 +44,17 @@ function initializeUI() {
 
     const ingredientsContainer = new GameObject({container: uiContainer})
         // .setId('ingredients')
+        .setTransitionEnabled(false)
         .setPosition(0, ingredientsContainerBottom)
         .setOrigin(0, .5)
+        .setTransitionEnabled(true)
     
     uiContainer.ingredientsContainer = ingredientsContainer;
 
 
     // creates cutting board GameObject as a div
     const cuttingBoard = new GameObject({container: ingredientsContainer})
+        .setTransitionEnabled(false)
         .setSize(450, 500)
         .setOrigin(.5, 0)
         .setPosition(Game.centerX, 100)
@@ -83,6 +87,7 @@ function initializeUI() {
     const ingredientsDraggerTop = 100;
     const ingredientsDraggerBottom = Game.height - 100;
     const ingredientsDragger = new DraggableGameObject({container: uiContainer, tag: 'img'})
+        // .setTransitionEnabled(false)
         .setAttribute('src', './assets/drag-arrow.png')
         .setSize(50, 50)
         // .setStyle('backgroundColor', 'coral')
