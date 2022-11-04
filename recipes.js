@@ -21,7 +21,7 @@ const rawRecipes = {
         ingredients: {
             corn: 1
         },
-        value: 1.5,
+        value: 1,
         name: 'Corn Cake',
         img: './assets/recipes/corn-cake.png',
         isKnown: true
@@ -30,7 +30,7 @@ const rawRecipes = {
         ingredients: {
             berries: 1
         },
-        value: 1.5,
+        value: 1,
         name: 'Cranberry Tart',
         img: './assets/recipes/cranberry-tart.png',
         isKnown: true
@@ -40,8 +40,8 @@ const rawRecipes = {
             berries: 1,
             pumpkin: 1
         },
-        potionLevel: 3,
-        catLevel: 3,
+        potionLevel: 2,
+        catLevel: 2,
         value: 2,
         name: 'Cranberry Pumpkin Muffin',
         img: './assets/recipes/cranberry-pumpkin-muffin.png',
@@ -51,8 +51,8 @@ const rawRecipes = {
             berries: 1,
             corn: 1
         },
-        potionLevel: 3,
-        catLevel: 3,
+        potionLevel: 2,
+        catLevel: 2,
         value: 2,
         name: 'Corn Cranberry Muffin',
         img: './assets/recipes/corn-cranberry-muffin.png',
@@ -62,8 +62,8 @@ const rawRecipes = {
             berries: 1,
             pumpkin: 1
         },
-        potionLevel: 1,
-        catLevel: 1,
+        potionLevel: 2,
+        catLevel: 2,
         value: 2.5,
         name: 'Pumpkin Cranberry Tart',
         img: './assets/recipes/pumpkin-cranberry-tart.png',
@@ -106,9 +106,9 @@ const rawRecipes = {
             corn: 1,
             pumpkin: 1
         },
-        potionLevel: 1,
-        catLevel: 1,
-        value: 2.5,
+        potionLevel: 3,
+        catLevel: 3,
+        value: 4,
         name: 'Pumpkin Corn Soup',
         img: './assets/recipes/pumpkin-corn-soup.png',
     },
@@ -117,9 +117,9 @@ const rawRecipes = {
             corn: 1,
             berries: 1
         },
-        potionLevel: 1,
-        catLevel: 1,
-        value: 2,
+        potionLevel: 3,
+        catLevel: 3,
+        value: 3,
         name: 'Cranberry Corn Cake',
         img: './assets/recipes/cranberry-corn-cake.png',
     },
@@ -128,9 +128,9 @@ const rawRecipes = {
             corn: 1,
             pumpkin: 1
         },
-        potionLevel: 1,
-        catLevel: 1,
-        value: 2.5,
+        potionLevel: 3,
+        catLevel: 3,
+        value: 3,
         name: 'Pumpkin Corn Cake',
         img: './assets/recipes/pumpkin-corn-cake.png',
     },
@@ -141,7 +141,7 @@ const rawRecipes = {
         },
         potionLevel: 1,
         catLevel: 1,
-        value: 2,
+        value: 2.5,
         name: 'Cranberry Pumpkin Pie',
         img: './assets/recipes/cranberry-pumpkin-pie.png',
     },
